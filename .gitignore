@@ -1,0 +1,29 @@
+# AI Assistant files
+CLAUDE.md
+
+# Node modules (if used)
+node_modules/
+
+# Environment files
+.env
+.env.local
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Extension temporary files
+*.crx
+*.pem
+*.zip
+
+# Privacy policy (if contains personal info)
+# privacy-policy.md
+
+# Chrome Web Store assets
+store-assets/
+screenshots/ 

@@ -4,11 +4,15 @@ const ALARM_NAME = 'processNextChunkAlarm';
 // Main listener to start or check the status of a job from the popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "organizeBookmarks") {
-    startOrganizationProcess();
-    return true;
+    startOrganizationProcess()
+      .then(() => sendResponse({ success: true }))
+      .catch((error) => sendResponse({ success: false, error: error.message }));
+    return true; // Keep channel open for async response
   } else if (request.action === "checkJobStatus") {
-    checkJobStatus().then(sendResponse);
-    return true;
+    checkJobStatus()
+      .then(sendResponse)
+      .catch((error) => sendResponse(null));
+    return true; // Keep channel open for async response
   }
 });
 
@@ -31,7 +35,11 @@ async function updateJobState(newState) {
   await chrome.storage.local.set({ [JOB_STORAGE_KEY]: updatedJob });
   
   // Also update the popup if it's open
-  chrome.runtime.sendMessage({ action: 'updateStatus', job: updatedJob }).catch(e => {}); // Ignore errors if popup isn't open
+  try {
+    chrome.runtime.sendMessage({ action: 'updateStatus', job: updatedJob });
+  } catch (error) {
+    // Popup might not be open, ignore the error
+  }
 }
 
 async function startOrganizationProcess() {

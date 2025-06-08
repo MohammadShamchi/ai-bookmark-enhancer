@@ -3,21 +3,99 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>API Key Settings</title>
-  <style> /* Basic styling for simplicity */
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    input { width: 400px; padding: 5px; }
-    button { padding: 5px 10px; margin-left: 10px; }
-    #message { margin-top: 10px; color: green; }
-  </style>
+  <title>AI Bookmark Organizer - Settings</title>
+  <link rel="stylesheet" href="options.css">
 </head>
 <body>
-  <h1>API Key for AI Organizer</h1>
-  <p>Please enter your OpenAI API key. Your key is stored locally and securely.</p>
-  <label for="apiKey">OpenAI API Key:</label>
-  <input type="password" id="apiKey">
-  <button id="saveBtn">Save</button>
-  <div id="message"></div>
+  <div class="background-effects">
+    <div class="particle-field"></div>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="grid-pattern"></div>
+  </div>
+  
+  <div class="container">
+    <header class="glass-header">
+      <div class="icon-container">
+        <svg class="app-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M2 17l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1>AI Bookmark Organizer</h1>
+      <p>Configure your OpenAI API key for intelligent bookmark organization</p>
+    </header>
+    
+    <div class="main-content">
+      <div class="settings-card">
+        <div class="card-header">
+          <svg class="key-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <h2>API Configuration</h2>
+        </div>
+        
+        <div class="input-group">
+          <label for="apiKey">OpenAI API Key</label>
+          <div class="input-wrapper">
+            <input type="password" id="apiKey" placeholder="sk-...">
+            <button type="button" class="toggle-visibility" id="toggleBtn">
+              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </button>
+          </div>
+          <div class="input-help">
+            Your API key is stored securely in your browser and never transmitted to our servers.
+          </div>
+        </div>
+        
+        <button id="saveBtn" class="stellar-button">
+          <span class="button-bg"></span>
+          <span class="button-content">
+            <svg class="button-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" stroke="currentColor" stroke-width="2"/>
+              <polyline points="17,21 17,13 7,13 7,21" stroke="currentColor" stroke-width="2"/>
+              <polyline points="7,3 7,8 15,8" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Save Configuration
+          </span>
+        </button>
+        
+        <div id="message" class="message-container">
+          <div class="message-icon"></div>
+          <div class="message-text"></div>
+        </div>
+      </div>
+      
+      <div class="info-card">
+        <div class="info-header">
+          <svg class="info-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 17h.01" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <h3>How to get your API key</h3>
+        </div>
+        <ol class="info-steps">
+          <li>Visit <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI API Keys</a></li>
+          <li>Create a new account or sign in</li>
+          <li>Click "Create new secret key"</li>
+          <li>Copy the key and paste it above</li>
+        </ol>
+        <div class="security-note">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+            <circle cx="12" cy="16" r="1" stroke="currentColor" stroke-width="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          Your API key is encrypted and stored locally in your browser.
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="options.js"></script>
 </body>

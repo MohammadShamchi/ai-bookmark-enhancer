@@ -1,46 +1,523 @@
+/* Import Geist Mono font */
+@import url('https://fonts.vercel.com/v1/geist/mono/style.css');
+
+/* CSS Variables for consistent theming */
+:root {
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --dark-glass: rgba(0, 0, 0, 0.3);
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --text-accent: #4facfe;
+  --success-color: #00ff88;
+  --error-color: #ff4757;
+  --warning-color: #ffa726;
+}
+
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  width: 300px;
-  padding: 10px;
-  background-color: #f4f4f9;
+  font-family: 'Geist Mono', 'Courier New', Courier, monospace;
+  width: 380px;
+  min-height: 500px;
+  background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+  color: var(--text-primary);
+  overflow: hidden;
+  position: relative;
 }
+
+/* Background Effects */
+.background-effects {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.particle-field {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, 0.1), transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.05), transparent),
+    radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.08), transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(255, 255, 255, 0.03), transparent);
+  background-size: 150px 150px;
+  animation: particleFloat 20s ease-in-out infinite;
+}
+
+.gradient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.3;
+  animation: orbFloat 15s ease-in-out infinite;
+}
+
+.orb-1 {
+  width: 150px;
+  height: 150px;
+  background: var(--primary-gradient);
+  top: -50px;
+  right: -50px;
+  animation-delay: 0s;
+}
+
+.orb-2 {
+  width: 120px;
+  height: 120px;
+  background: var(--accent-gradient);
+  bottom: -40px;
+  left: -40px;
+  animation-delay: 7s;
+}
+
+.grid-pattern {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: gridShift 30s linear infinite;
+}
+
+/* Container and Layout */
 .container {
+  position: relative;
+  z-index: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 500px;
+}
+
+/* Glass Card Header */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 24px;
   text-align: center;
+  width: 100%;
+  margin-bottom: 24px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
 }
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--accent-gradient);
+  opacity: 0.5;
+}
+
+.icon-container {
+  margin-bottom: 16px;
+}
+
+.app-icon {
+  width: 40px;
+  height: 40px;
+  color: var(--text-accent);
+  animation: iconGlow 3s ease-in-out infinite;
+}
+
 h1 {
-  font-size: 18px;
-  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
 }
+
 p {
   font-size: 14px;
-  color: #666;
+  color: var(--text-secondary);
+  line-height: 1.5;
 }
-#organizeBtn {
+
+/* Main Content */
+.main-content {
   width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  background-color: #4A90E2;
-  color: white;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Stellar Button */
+.stellar-button {
+  position: relative;
+  width: 100%;
+  padding: 0;
   border: none;
-  border-radius: 5px;
+  background: transparent;
+  border-radius: 16px;
   cursor: pointer;
-  margin-top: 10px;
+  overflow: hidden;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-#organizeBtn:disabled {
-  background-color: #b0c4de;
+
+.button-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--primary-gradient);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 16px;
+}
+
+.button-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 24px;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.button-icon {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.button-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stellar-button:hover .button-bg {
+  background: var(--secondary-gradient);
+  transform: scale(1.02);
+}
+
+.stellar-button:hover .button-content {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.stellar-button:hover .button-icon {
+  transform: rotate(5deg) scale(1.1);
+}
+
+.stellar-button:hover .button-particles {
+  opacity: 1;
+}
+
+.stellar-button:active .button-content {
+  transform: translateY(0);
+}
+
+.stellar-button:disabled {
   cursor: not-allowed;
+  opacity: 0.6;
 }
-#status {
-  margin-top: 15px;
+
+.stellar-button:disabled .button-bg {
+  background: var(--dark-glass);
+}
+
+.stellar-button:disabled:hover .button-content {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Status Container */
+.status-container {
+  width: 100%;
+  min-height: 80px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(15px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.status-container.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.status-icon {
+  position: relative;
+  width: 24px;
+  height: 24px;
+}
+
+.pulse-ring {
+  position: absolute;
+  border: 2px solid var(--text-accent);
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  opacity: 0;
+}
+
+.status-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: var(--text-accent);
+  border-radius: 50%;
+}
+
+.status-text {
   font-size: 14px;
-  color: #333;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.4;
   min-height: 20px;
 }
-.options-link {
-  margin-top: 15px;
-  font-size: 12px;
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
-a {
-  color: #4A90E2;
+
+.progress-bar.visible {
+  opacity: 1;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent-gradient);
+  border-radius: 2px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Glass Footer */
+.glass-footer {
+  margin-top: auto;
+  width: 100%;
+}
+
+.settings-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  color: var(--text-secondary);
   text-decoration: none;
-} 
+  font-size: 13px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.settings-link svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.settings-link:hover {
+  color: var(--text-accent);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.settings-link:hover svg {
+  transform: rotate(90deg);
+}
+
+/* Status States */
+.status-container.running .status-dot {
+  background: var(--warning-color);
+  animation: statusPulse 1.5s ease-in-out infinite;
+}
+
+.status-container.success .status-dot {
+  background: var(--success-color);
+}
+
+.status-container.error .status-dot {
+  background: var(--error-color);
+}
+
+.status-container.running .pulse-ring {
+  border-color: var(--warning-color);
+}
+
+.status-container.success .pulse-ring {
+  border-color: var(--success-color);
+}
+
+.status-container.error .pulse-ring {
+  border-color: var(--error-color);
+}
+
+/* Animations */
+@keyframes particleFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(180deg); }
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.1) rotate(180deg); }
+}
+
+@keyframes gridShift {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(20px, 20px); }
+}
+
+@keyframes iconGlow {
+  0%, 100% { filter: drop-shadow(0 0 5px rgba(79, 172, 254, 0.3)); }
+  50% { filter: drop-shadow(0 0 15px rgba(79, 172, 254, 0.6)); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Responsive adjustments */
+@media (max-height: 500px) {
+  .container {
+    min-height: auto;
+  }
+  
+  .glass-card {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .main-content {
+    gap: 20px;
+  }
+}
+
+/* Enhanced animations for status updates */
+.status-text.updated {
+  animation: textSlide 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes textSlide {
+  0% { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+/* Button particle effects */
+.stellar-button:hover .button-particles::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: particleSpread 0.6s ease-out;
+}
+
+@keyframes particleSpread {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2);
+  }
+}

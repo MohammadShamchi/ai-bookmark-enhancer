@@ -1,19 +1,146 @@
+// Sound system
+class SoundManager {
+  constructor() {
+    this.context = null;
+    this.sounds = {};
+    this.enabled = true;
+    this.volume = 0.3;
+    this.initAudio();
+  }
+
+  async initAudio() {
+    try {
+      this.context = new (window.AudioContext || window.webkitAudioContext)();
+      await this.loadSounds();
+    } catch (error) {
+      console.warn('Audio context not available:', error);
+      this.enabled = false;
+    }
+  }
+
+  async loadSounds() {
+    const soundConfigs = {
+      click: { frequency: 800, duration: 0.1, type: 'sine' },
+      hover: { frequency: 600, duration: 0.05, type: 'sine' },
+      success: { frequency: [523, 659, 784], duration: 0.2, type: 'sine' },
+      error: { frequency: [400, 300], duration: 0.3, type: 'square' },
+      processing: { frequency: 440, duration: 0.1, type: 'triangle' }
+    };
+
+    for (const [name, config] of Object.entries(soundConfigs)) {
+      this.sounds[name] = config;
+    }
+  }
+
+  playSound(soundName, volume = this.volume) {
+    if (!this.enabled || !this.context || !this.sounds[soundName]) return;
+
+    const config = this.sounds[soundName];
+    const oscillator = this.context.createOscillator();
+    const gainNode = this.context.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(this.context.destination);
+
+    if (Array.isArray(config.frequency)) {
+      // Multi-tone sound
+      config.frequency.forEach((freq, index) => {
+        setTimeout(() => {
+          const osc = this.context.createOscillator();
+          const gain = this.context.createGain();
+          osc.connect(gain);
+          gain.connect(this.context.destination);
+          
+          osc.frequency.setValueAtTime(freq, this.context.currentTime);
+          osc.type = config.type;
+          gain.gain.setValueAtTime(volume * 0.5, this.context.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + config.duration);
+          
+          osc.start();
+          osc.stop(this.context.currentTime + config.duration);
+        }, index * 100);
+      });
+    } else {
+      oscillator.frequency.setValueAtTime(config.frequency, this.context.currentTime);
+      oscillator.type = config.type;
+      gainNode.gain.setValueAtTime(volume, this.context.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + config.duration);
+      
+      oscillator.start();
+      oscillator.stop(this.context.currentTime + config.duration);
+    }
+  }
+}
+
+const soundManager = new SoundManager();
+
 document.addEventListener('DOMContentLoaded', () => {
   const organizeBtn = document.getElementById('organizeBtn');
-  const statusDiv = document.getElementById('status');
+  const statusContainer = document.getElementById('status');
+  const statusText = statusContainer.querySelector('.status-text');
+  const progressBar = statusContainer.querySelector('.progress-bar');
+  const progressFill = statusContainer.querySelector('.progress-fill');
+
+  // Add sound effects to button interactions
+  organizeBtn.addEventListener('mouseenter', () => {
+    soundManager.playSound('hover', 0.2);
+  });
+
+  organizeBtn.addEventListener('click', () => {
+    soundManager.playSound('click');
+  });
 
   function updateUi(job) {
+    // Reset status container classes
+    statusContainer.classList.remove('visible', 'running', 'success', 'error');
+    statusText.classList.remove('updated');
+    progressBar.classList.remove('visible');
+    
+    // Trigger reflow for animation
+    void statusContainer.offsetWidth;
+
     if (!job) {
-      statusDiv.textContent = '';
+      statusText.textContent = '';
       organizeBtn.disabled = false;
-      checkApiKey(); // Check if key is set to disable button
+      progressFill.style.width = '0%';
+      checkApiKey();
       return;
     }
 
-    statusDiv.textContent = job.message || '';
+    // Show status container
+    statusContainer.classList.add('visible');
+    
+    // Update status text with animation
+    statusText.textContent = job.message || '';
+    statusText.classList.add('updated');
+
+    // Handle different job states
     if (job.status === 'running') {
       organizeBtn.disabled = true;
-    } else { // 'complete', 'error', or undefined
+      statusContainer.classList.add('running');
+      progressBar.classList.add('visible');
+      soundManager.playSound('processing', 0.1);
+      
+      // Update progress if available
+      if (job.chunkIndex && job.totalChunks) {
+        const progress = (job.chunkIndex / job.totalChunks) * 100;
+        progressFill.style.width = `${progress}%`;
+      }
+    } else if (job.status === 'complete') {
+      organizeBtn.disabled = false;
+      statusContainer.classList.add('success');
+      progressFill.style.width = '100%';
+      soundManager.playSound('success');
+      
+      // Auto-hide after success
+      setTimeout(() => {
+        statusContainer.classList.remove('visible');
+      }, 3000);
+    } else if (job.status === 'error') {
+      organizeBtn.disabled = false;
+      statusContainer.classList.add('error');
+      soundManager.playSound('error');
+    } else {
       organizeBtn.disabled = false;
     }
   }
@@ -21,7 +148,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function checkApiKey() {
       chrome.storage.sync.get(['openaiApiKey'], (result) => {
         if (!result.openaiApiKey) {
-          statusDiv.innerHTML = 'API Key not set. Please <a href="options.html" target="_blank">set it</a>.';
+          statusContainer.classList.add('visible');
+          statusText.classList.remove('updated');
+          void statusText.offsetWidth;
+          statusText.innerHTML = 'API Key not set. Please <a href="options.html" target="_blank">configure it</a>.';
+          statusText.classList.add('updated');
           organizeBtn.disabled = true;
         }
       });
@@ -36,16 +167,30 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   organizeBtn.addEventListener('click', () => {
-    // This message starts the whole process in the background script
-    chrome.runtime.sendMessage({ action: "organizeBookmarks" });
+    // Check API key before starting
+    chrome.storage.sync.get(['openaiApiKey'], (result) => {
+      if (!result.openaiApiKey || result.openaiApiKey.trim() === '') {
+        updateUi({ status: 'error', message: 'Please set your OpenAI API key in options first.' });
+        return;
+      }
+      
+      // This message starts the whole process in the background script
+      chrome.runtime.sendMessage({ action: "organizeBookmarks" }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.error('Failed to start organization:', chrome.runtime.lastError.message);
+          updateUi({ status: 'error', message: 'Failed to start organization process.' });
+        }
+      });
+    });
   });
 
   // Listen for status updates from the background script
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'updateStatus') {
         updateUi(request.job);
+        sendResponse({ received: true });
     }
-    return true;
+    // Don't return true unless we're handling async response
   });
 
   checkApiKey(); // Initial check
