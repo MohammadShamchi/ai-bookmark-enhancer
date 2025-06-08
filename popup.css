@@ -1,0 +1,46 @@
+body {
+  font-family: Arial, sans-serif;
+  width: 300px;
+  padding: 10px;
+  background-color: #f4f4f9;
+}
+.container {
+  text-align: center;
+}
+h1 {
+  font-size: 18px;
+  color: #333;
+}
+p {
+  font-size: 14px;
+  color: #666;
+}
+#organizeBtn {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  background-color: #4A90E2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+#organizeBtn:disabled {
+  background-color: #b0c4de;
+  cursor: not-allowed;
+}
+#status {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #333;
+  min-height: 20px;
+}
+.options-link {
+  margin-top: 15px;
+  font-size: 12px;
+}
+a {
+  color: #4A90E2;
+  text-decoration: none;
+} 
