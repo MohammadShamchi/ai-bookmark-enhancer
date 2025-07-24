@@ -213,6 +213,7 @@ body {
   cursor: pointer;
   transition: background-color var(--transition-fast);
   color: var(--text-secondary);
+  position: relative;
 }
 
 .model-option:hover {
@@ -247,6 +248,42 @@ body {
 
 .model-option.selected .model-check {
   opacity: 1;
+}
+
+.model-option .model-badge {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: var(--space-xs);
+  margin-right: var(--space-xs);
+}
+
+.model-option[data-model="gpt-4.1-mini"] .model-badge {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.model-option[data-model="gpt-4.1"] .model-badge {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+}
+
+.model-option[data-model="gpt-4o-mini"] .model-badge {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+}
+
+.model-option[data-model="gpt-4.1-nano"] .model-badge {
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
+  color: white;
+}
+
+.model-option[data-model="gpt-4-turbo"] .model-badge {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  color: white;
 }
 
 .main-card {

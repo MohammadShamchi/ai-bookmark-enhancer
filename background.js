@@ -347,46 +347,99 @@ function repairAIResponse(response, inputBookmarks, validation) {
 // Intelligent model selection based on task requirements and availability
 function selectOptimalModel(selectedModel, bookmarkCount) {
   const modelCapabilities = {
-    'gpt-4': { 
+    'gpt-4.1': { 
       quality: 10, 
+      speed: 8, 
+      cost: 4, 
+      maxTokens: 1000000, // 1M tokens
+      reliability: 10,
+      categorization: 10,
+      supportsJsonMode: true,
+      contextWindow: 1000000,
+      knowledgeCutoff: '2024-06'
+    },
+    'gpt-4.1-mini': { 
+      quality: 9, 
+      speed: 9, 
+      cost: 9, 
+      maxTokens: 1000000, // 1M tokens
+      reliability: 9,
+      categorization: 9,
+      supportsJsonMode: true,
+      contextWindow: 1000000,
+      knowledgeCutoff: '2024-06'
+    },
+    'gpt-4.1-nano': { 
+      quality: 8, 
+      speed: 10, 
+      cost: 10, 
+      maxTokens: 1000000, // 1M tokens
+      reliability: 8,
+      categorization: 8,
+      supportsJsonMode: true,
+      contextWindow: 1000000,
+      knowledgeCutoff: '2024-06'
+    },
+    'gpt-4o-mini': { 
+      quality: 8, 
+      speed: 9, 
+      cost: 9, 
+      maxTokens: 128000,
+      reliability: 8,
+      categorization: 8,
+      supportsJsonMode: true,
+      contextWindow: 128000,
+      knowledgeCutoff: '2023-10'
+    },
+    'gpt-4-turbo': { 
+      quality: 9, 
+      speed: 7, 
+      cost: 5, 
+      maxTokens: 128000,
+      reliability: 9,
+      categorization: 9,
+      supportsJsonMode: true,
+      contextWindow: 128000,
+      knowledgeCutoff: '2023-12'
+    },
+    'gpt-4': { 
+      quality: 9, 
       speed: 6, 
       cost: 3, 
       maxTokens: 8192,
       reliability: 9,
-      categorization: 10,
-      supportsJsonMode: false  // Standard GPT-4 doesn't support response_format json_object
-    },
-    'gpt-4-turbo': { 
-      quality: 10, 
-      speed: 8, 
-      cost: 5, 
-      maxTokens: 128000,
-      reliability: 9,
-      categorization: 10,
-      supportsJsonMode: true
+      categorization: 9,
+      supportsJsonMode: false,
+      contextWindow: 8192,
+      knowledgeCutoff: '2023-09'
     },
     'gpt-3.5-turbo': { 
       quality: 7, 
       speed: 9, 
-      cost: 9, 
+      cost: 8, 
       maxTokens: 4096,
       reliability: 8,
       categorization: 7,
-      supportsJsonMode: true
+      supportsJsonMode: true,
+      contextWindow: 4096,
+      knowledgeCutoff: '2023-09'
     }
   };
 
-  // Model preference order based on task requirements and JSON support
+  // Model preference order based on task requirements and JSON support (2025 optimized)
   const getModelOrder = (bookmarkCount) => {
     if (bookmarkCount > 1000) {
-      // Large datasets: prioritize speed, cost efficiency, and JSON support
-      return ['gpt-4-turbo', 'gpt-3.5-turbo'];
+      // Large datasets: prioritize speed and cost efficiency with large context
+      return ['gpt-4.1-nano', 'gpt-4.1-mini', 'gpt-4o-mini'];
+    } else if (bookmarkCount > 500) {
+      // Medium-large datasets: balance quality and speed
+      return ['gpt-4.1-mini', 'gpt-4.1-nano', 'gpt-4o-mini'];
     } else if (bookmarkCount > 100) {
-      // Medium datasets: balance quality and speed, prefer JSON-capable models
-      return ['gpt-4-turbo', 'gpt-3.5-turbo'];
+      // Medium datasets: optimal balance, recommended for most users
+      return ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o-mini'];
     } else {
-      // Small datasets: prioritize quality but ensure JSON support
-      return ['gpt-4-turbo', 'gpt-3.5-turbo'];
+      // Small datasets: prioritize quality, can afford premium models
+      return ['gpt-4.1', 'gpt-4.1-mini', 'gpt-4o-mini'];
     }
   };
 
@@ -1002,11 +1055,15 @@ async function applyOrganization(categories) {
 
 function getModelDisplayName(model) {
   const modelNames = {
+    'gpt-4.1': 'GPT-4.1',
+    'gpt-4.1-mini': 'GPT-4.1 Mini',
+    'gpt-4.1-nano': 'GPT-4.1 Nano',
+    'gpt-4o-mini': 'GPT-4o Mini',
+    'gpt-4-turbo': 'GPT-4 Turbo',
     'gpt-4': 'GPT-4',
-    'gpt-3.5-turbo': 'GPT-3.5 Turbo',
-    'gpt-4-turbo': 'GPT-4 Turbo'
+    'gpt-3.5-turbo': 'GPT-3.5 Turbo'
   };
-  return modelNames[model] || 'GPT-4';
+  return modelNames[model] || 'GPT-4.1 Mini';
 } 
 
 // Add alarm creation on install/update

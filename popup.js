@@ -131,6 +131,9 @@ document.addEventListener('DOMContentLoaded', () => {
         savedOption.classList.add('selected');
         selectedModel.textContent = savedOption.querySelector('.model-name').textContent;
       }
+    } else {
+      // Default to GPT-4.1 Mini if no preference saved
+      chrome.storage.sync.set({ selectedModel: 'gpt-4.1-mini' });
     }
   });
 
@@ -285,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       
-      const selectedModel = result.selectedModel || 'gpt-4';
+      const selectedModel = result.selectedModel || 'gpt-4.1-mini';
       
       // This message starts the whole process in the background script
       chrome.runtime.sendMessage({ 
