@@ -8,58 +8,100 @@
 </head>
 <body>
   <div class="background-effects">
-    <div class="particle-field"></div>
-    <div class="gradient-orb orb-1"></div>
-    <div class="gradient-orb orb-2"></div>
-    <div class="grid-pattern"></div>
+    <div class="mesh-gradient"></div>
+    <div class="floating-particles"></div>
+    <div class="glass-reflections"></div>
   </div>
   
   <div class="container">
-    <header class="glass-card">
-      <div class="icon-container">
-        <svg class="app-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-          <path d="M2 17l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-          <path d="M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h1>AI Bookmark Organizer</h1>
-      <p>Intelligent bookmark organization powered by AI</p>
-    </header>
-    
-    <div class="main-content">
-      <button id="organizeBtn" class="stellar-button">
-        <span class="button-bg"></span>
-        <span class="button-content">
-          <svg class="button-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-          </svg>
-          Organize My Bookmarks
-        </span>
-        <div class="button-particles"></div>
-      </button>
-      
-      <div id="status" class="status-container">
-        <div class="status-icon">
-          <div class="pulse-ring"></div>
-          <div class="status-dot"></div>
+    <div class="status-indicator">
+      <div class="status-dot ai-ready"></div>
+      <span class="status-label">AI Assistant Ready</span>
+      <div class="model-badge" id="modelBadge">
+        <span id="selectedModel">GPT-4</span>
+        <div class="model-dropdown" id="modelDropdown">
+          <div class="model-option selected" data-model="gpt-4">
+            <span class="model-name">GPT-4</span>
+            <svg class="model-check" viewBox="0 0 24 24" fill="none">
+              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="model-option" data-model="gpt-3.5-turbo">
+            <span class="model-name">GPT-3.5 Turbo</span>
+            <svg class="model-check" viewBox="0 0 24 24" fill="none">
+              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="model-option" data-model="gpt-4-turbo">
+            <span class="model-name">GPT-4 Turbo</span>
+            <svg class="model-check" viewBox="0 0 24 24" fill="none">
+              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
         </div>
-        <div class="status-text"></div>
-        <div class="progress-bar">
-          <div class="progress-fill"></div>
+      </div>
+      <svg class="settings-icon-header" id="settingsIcon" viewBox="0 0 24 24" fill="none">
+        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+    </div>
+    
+    <div class="main-card">
+      <div class="card-header">
+        <div class="app-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+          </svg>
+        </div>
+        <div class="header-content">
+          <h1>Organize Bookmarks</h1>
+          <p>AI-powered bookmark organization</p>
+        </div>
+      </div>
+      
+      <div class="card-body">
+        <button id="organizeBtn" class="primary-button">
+          <div class="button-content">
+            <div class="button-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span>Organize My Bookmarks</span>
+          </div>
+          <div class="button-shimmer"></div>
+        </button>
+        
+        <div id="status" class="status-panel">
+          <div class="status-content">
+            <div class="status-indicator-dot"></div>
+            <div class="status-text"></div>
+            <div id="taskList" class="task-list"></div>
+          </div>
+          <div class="progress-container">
+            <div class="progress-track">
+              <div class="progress-fill"></div>
+            </div>
+          </div>
+          <button id="resetBtn" class="reset-button" style="display: none;">Reset</button>
+          <button id="emergencyStopBtn" class="emergency-stop-button" style="display: none;">🚨 EMERGENCY STOP</button>
+        </div>
+      </div>
+      
+      <div class="card-footer">
+        <a href="options.html" target="_blank" class="settings-button">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          <span>Configure API Key</span>
+        </a>
+        <div class="button-group">
+          <button id="debugBtn" class="debug-button">🔍 Debug Bookmarks</button>
+          <button id="forceUnlockBtn" class="force-unlock-button">🔓 Force Unlock</button>
         </div>
       </div>
     </div>
-    
-    <footer class="glass-footer">
-      <a href="options.html" target="_blank" class="settings-link">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
-          <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1" stroke="currentColor" stroke-width="2"/>
-        </svg>
-        Configure API Key
-      </a>
-    </footer>
   </div>
   
   <script src="popup.js"></script>

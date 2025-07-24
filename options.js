@@ -1,36 +1,42 @@
 // Sound system (simplified for options page)
 class SoundManager {
   constructor() {
-    this.context = null;
+    this.sounds = {};
     this.enabled = true;
     this.volume = 0.2;
-    this.initAudio();
+    this.loadSounds();
   }
 
-  async initAudio() {
-    try {
-      this.context = new (window.AudioContext || window.webkitAudioContext)();
-    } catch (error) {
-      this.enabled = false;
+  async loadSounds() {
+    const soundFiles = {
+      hover: 'Audio/mixkit-sparkle-hybrid-transition-3060.wav',
+      click: 'Audio/mixkit-on-or-off-light-switch-tap-2585.wav',
+      success: 'Audio/mixkit-magical-light-sweep-2586.wav',
+      error: 'Audio/mixkit-on-or-off-light-switch-tap-2585.wav'
+    };
+
+    for (const [name, path] of Object.entries(soundFiles)) {
+      try {
+        const audio = new Audio(path);
+        await new Promise((resolve, reject) => {
+          audio.addEventListener('loadeddata', resolve);
+          audio.addEventListener('error', reject);
+          audio.load();
+        });
+        this.sounds[name] = audio;
+      } catch (error) {
+        console.warn(`Failed to load sound ${name}:`, error);
+      }
     }
   }
 
-  playSound(frequency = 600, duration = 0.1, type = 'sine') {
-    if (!this.enabled || !this.context) return;
-
-    const oscillator = this.context.createOscillator();
-    const gainNode = this.context.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(this.context.destination);
-
-    oscillator.frequency.setValueAtTime(frequency, this.context.currentTime);
-    oscillator.type = type;
-    gainNode.gain.setValueAtTime(this.volume, this.context.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + duration);
-    
-    oscillator.start();
-    oscillator.stop(this.context.currentTime + duration);
+  playSound(soundName, volume = this.volume) {
+    if (!this.enabled || !this.sounds[soundName]) return;
+    const audio = this.sounds[soundName].cloneNode();
+    audio.volume = volume;
+    audio.play().catch(error => {
+      console.warn('Audio playback failed:', error);
+    });
   }
 }
 
@@ -39,8 +45,8 @@ const soundManager = new SoundManager();
 const apiKeyInput = document.getElementById('apiKey');
 const saveBtn = document.getElementById('saveBtn');
 const toggleBtn = document.getElementById('toggleBtn');
-const messageContainer = document.getElementById('message');
-const messageText = messageContainer.querySelector('.message-text');
+const messagePanel = document.getElementById('message');
+const messageText = messagePanel.querySelector('.message-text');
 
 // Toggle password visibility
 toggleBtn.addEventListener('click', () => {
@@ -50,12 +56,12 @@ toggleBtn.addEventListener('click', () => {
   // Update icon (you could add different icons for show/hide)
   toggleBtn.style.transform = isPassword ? 'rotate(180deg)' : 'rotate(0deg)';
   
-  soundManager.playSound(400, 0.05);
+  soundManager.playSound('click');
 });
 
 // Add hover sound to button
 saveBtn.addEventListener('mouseenter', () => {
-  soundManager.playSound(600, 0.05);
+  soundManager.playSound('hover');
 });
 
 // Load the saved API key when the page opens
@@ -72,31 +78,28 @@ saveBtn.addEventListener('click', () => {
   const apiKey = apiKeyInput.value.trim();
   
   // Reset message state
-  messageContainer.classList.remove('visible', 'success', 'error');
+  messagePanel.classList.remove('visible', 'success', 'error');
   
   if (apiKey) {
     chrome.storage.sync.set({ openaiApiKey: apiKey }, () => {
       // Show success message
       messageText.textContent = 'API Key saved successfully!';
-      messageContainer.classList.add('visible', 'success');
+      messagePanel.classList.add('visible', 'success');
       
       // Play success sound
-      soundManager.playSound(523, 0.1);
-      setTimeout(() => soundManager.playSound(659, 0.1), 100);
-      setTimeout(() => soundManager.playSound(784, 0.1), 200);
+      soundManager.playSound('success');
       
       // Auto-hide after 3 seconds
       setTimeout(() => {
-        messageContainer.classList.remove('visible');
+        messagePanel.classList.remove('visible');
       }, 3000);
     });
   } else {
     // Show error message
     messageText.textContent = 'Please enter a valid API key.';
-    messageContainer.classList.add('visible', 'error');
+    messagePanel.classList.add('visible', 'error');
     
     // Play error sound
-    soundManager.playSound(400, 0.2, 'square');
-    setTimeout(() => soundManager.playSound(300, 0.2, 'square'), 150);
+    soundManager.playSound('error');
   }
 }); 

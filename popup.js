@@ -1,85 +1,72 @@
 // Sound system
 class SoundManager {
   constructor() {
-    this.context = null;
     this.sounds = {};
     this.enabled = true;
     this.volume = 0.3;
-    this.initAudio();
-  }
-
-  async initAudio() {
-    try {
-      this.context = new (window.AudioContext || window.webkitAudioContext)();
-      await this.loadSounds();
-    } catch (error) {
-      console.warn('Audio context not available:', error);
-      this.enabled = false;
-    }
+    this.loadSounds();
   }
 
   async loadSounds() {
-    const soundConfigs = {
-      click: { frequency: 800, duration: 0.1, type: 'sine' },
-      hover: { frequency: 600, duration: 0.05, type: 'sine' },
-      success: { frequency: [523, 659, 784], duration: 0.2, type: 'sine' },
-      error: { frequency: [400, 300], duration: 0.3, type: 'square' },
-      processing: { frequency: 440, duration: 0.1, type: 'triangle' }
+    const soundFiles = {
+      hover: 'Audio/mixkit-sparkle-hybrid-transition-3060.wav',
+      click: 'Audio/mixkit-on-or-off-light-switch-tap-2585.wav',
+      success: 'Audio/mixkit-magical-light-sweep-2586.wav',
+      error: 'Audio/mixkit-on-or-off-light-switch-tap-2585.wav',
+      processing: 'Audio/mixkit-sparkle-hybrid-transition-3060.wav'
     };
 
-    for (const [name, config] of Object.entries(soundConfigs)) {
-      this.sounds[name] = config;
+    for (const [name, path] of Object.entries(soundFiles)) {
+      try {
+        const audio = new Audio(path);
+        await new Promise((resolve, reject) => {
+          audio.addEventListener('loadeddata', resolve);
+          audio.addEventListener('error', reject);
+          audio.load();
+        });
+        this.sounds[name] = audio;
+      } catch (error) {
+        console.warn(`Failed to load sound ${name}:`, error);
+      }
     }
   }
 
   playSound(soundName, volume = this.volume) {
-    if (!this.enabled || !this.context || !this.sounds[soundName]) return;
-
-    const config = this.sounds[soundName];
-    const oscillator = this.context.createOscillator();
-    const gainNode = this.context.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(this.context.destination);
-
-    if (Array.isArray(config.frequency)) {
-      // Multi-tone sound
-      config.frequency.forEach((freq, index) => {
-        setTimeout(() => {
-          const osc = this.context.createOscillator();
-          const gain = this.context.createGain();
-          osc.connect(gain);
-          gain.connect(this.context.destination);
-          
-          osc.frequency.setValueAtTime(freq, this.context.currentTime);
-          osc.type = config.type;
-          gain.gain.setValueAtTime(volume * 0.5, this.context.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + config.duration);
-          
-          osc.start();
-          osc.stop(this.context.currentTime + config.duration);
-        }, index * 100);
-      });
-    } else {
-      oscillator.frequency.setValueAtTime(config.frequency, this.context.currentTime);
-      oscillator.type = config.type;
-      gainNode.gain.setValueAtTime(volume, this.context.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + config.duration);
-      
-      oscillator.start();
-      oscillator.stop(this.context.currentTime + config.duration);
-    }
+    if (!this.enabled || !this.sounds[soundName]) return;
+    const audio = this.sounds[soundName].cloneNode();
+    audio.volume = volume;
+    audio.play().catch(error => {
+      console.warn('Audio playback failed:', error);
+    });
   }
 }
 
 const soundManager = new SoundManager();
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Debug: Check if buttons exist
+  console.log('🔍 Debug button exists:', !!document.getElementById('debugBtn'));
+  console.log('🔓 Force unlock button exists:', !!document.getElementById('forceUnlockBtn'));
+  console.log('📋 All elements in footer:', document.querySelector('.card-footer').innerHTML);
+  
   const organizeBtn = document.getElementById('organizeBtn');
-  const statusContainer = document.getElementById('status');
-  const statusText = statusContainer.querySelector('.status-text');
-  const progressBar = statusContainer.querySelector('.progress-bar');
-  const progressFill = statusContainer.querySelector('.progress-fill');
+  const statusPanel = document.getElementById('status');
+  const statusText = statusPanel.querySelector('.status-text');
+  const progressContainer = statusPanel.querySelector('.progress-container');
+  const progressFill = statusPanel.querySelector('.progress-fill');
+  
+  // Model selection functionality
+  const modelBadge = document.getElementById('modelBadge');
+  const modelDropdown = document.getElementById('modelDropdown');
+  const selectedModel = document.getElementById('selectedModel');
+  const modelOptions = modelDropdown.querySelectorAll('.model-option');
+  
+  // Settings icon functionality
+  const settingsIcon = document.getElementById('settingsIcon');
+  
+  // Debug and utility buttons
+  const debugBtn = document.getElementById('debugBtn');
+  const forceUnlockBtn = document.getElementById('forceUnlockBtn');
 
   // Add sound effects to button interactions
   organizeBtn.addEventListener('mouseenter', () => {
@@ -90,35 +77,106 @@ document.addEventListener('DOMContentLoaded', () => {
     soundManager.playSound('click');
   });
 
+  // Model dropdown toggle
+  modelBadge.addEventListener('click', (e) => {
+    e.stopPropagation();
+    modelDropdown.classList.toggle('show');
+    soundManager.playSound('click', 0.3);
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!modelBadge.contains(e.target)) {
+      modelDropdown.classList.remove('show');
+    }
+  });
+
+  // Model selection
+  modelOptions.forEach(option => {
+    option.addEventListener('click', (e) => {
+      e.stopPropagation();
+      
+      // Remove selected class from all options
+      modelOptions.forEach(opt => opt.classList.remove('selected'));
+      
+      // Add selected class to clicked option
+      option.classList.add('selected');
+      
+      // Update displayed model
+      const modelName = option.dataset.model;
+      selectedModel.textContent = option.querySelector('.model-name').textContent;
+      
+      // Store selected model
+      chrome.storage.sync.set({ selectedModel: modelName });
+      
+      // Close dropdown
+      modelDropdown.classList.remove('show');
+      
+      soundManager.playSound('click', 0.4);
+    });
+  });
+
+  // Settings icon click
+  settingsIcon.addEventListener('click', () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
+    soundManager.playSound('click', 0.4);
+  });
+
+  // Load saved model preference
+  chrome.storage.sync.get(['selectedModel'], (result) => {
+    if (result.selectedModel) {
+      const savedOption = modelDropdown.querySelector(`[data-model="${result.selectedModel}"]`);
+      if (savedOption) {
+        modelOptions.forEach(opt => opt.classList.remove('selected'));
+        savedOption.classList.add('selected');
+        selectedModel.textContent = savedOption.querySelector('.model-name').textContent;
+      }
+    }
+  });
+
   function updateUi(job) {
-    // Reset status container classes
-    statusContainer.classList.remove('visible', 'running', 'success', 'error');
+    // Reset status panel classes
+    statusPanel.classList.remove('visible', 'running', 'success', 'error');
     statusText.classList.remove('updated');
-    progressBar.classList.remove('visible');
+    progressContainer.classList.remove('visible');
+    progressFill.classList.remove('animating');
     
     // Trigger reflow for animation
-    void statusContainer.offsetWidth;
+    void statusPanel.offsetWidth;
 
     if (!job) {
       statusText.textContent = '';
       organizeBtn.disabled = false;
       progressFill.style.width = '0%';
+      resetBtn.style.display = 'none';
+      emergencyStopBtn.style.display = 'none'; // Hide emergency stop when no job
       checkApiKey();
       return;
     }
 
-    // Show status container
-    statusContainer.classList.add('visible');
+    // Show status panel
+    statusPanel.classList.add('visible');
     
     // Update status text with animation
-    statusText.textContent = job.message || '';
+    let message = job.message || '';
+    if (job.progress !== undefined) {
+      message += ` (${Math.round(job.progress)}%)`;
+    }
+    if (job.eta) {
+      const etaMin = Math.round(job.eta / 60);
+      message += ` (ETA: ${etaMin} min)`;
+    }
+    statusText.textContent = message;
     statusText.classList.add('updated');
 
     // Handle different job states
     if (job.status === 'running') {
       organizeBtn.disabled = true;
-      statusContainer.classList.add('running');
-      progressBar.classList.add('visible');
+      statusPanel.classList.add('running');
+      progressContainer.classList.add('visible');
+      progressFill.style.width = `${job.progress || 0}%`;
+      resetBtn.style.display = 'none';
+      emergencyStopBtn.style.display = 'block'; // Show emergency stop during processing
       soundManager.playSound('processing', 0.1);
       
       // Update progress if available
@@ -126,29 +184,61 @@ document.addEventListener('DOMContentLoaded', () => {
         const progress = (job.chunkIndex / job.totalChunks) * 100;
         progressFill.style.width = `${progress}%`;
       }
+      if (job.message && job.message.includes('Processing')) {
+        progressFill.classList.add('animating');
+      } else {
+        progressFill.classList.remove('animating');
+      }
     } else if (job.status === 'complete') {
       organizeBtn.disabled = false;
-      statusContainer.classList.add('success');
+      statusPanel.classList.add('success');
       progressFill.style.width = '100%';
+      resetBtn.style.display = 'none';
+      emergencyStopBtn.style.display = 'none'; // Hide emergency stop when complete
       soundManager.playSound('success');
       
       // Auto-hide after success
       setTimeout(() => {
-        statusContainer.classList.remove('visible');
+        statusPanel.classList.remove('visible');
       }, 3000);
     } else if (job.status === 'error') {
       organizeBtn.disabled = false;
-      statusContainer.classList.add('error');
+      statusPanel.classList.add('error');
+      progressFill.style.width = '0%';
+      resetBtn.style.display = 'block';
+      emergencyStopBtn.style.display = 'none'; // Hide emergency stop on error
       soundManager.playSound('error');
+      if (job.errorCount > 1) {
+        statusText.innerHTML += '<br>Suggestion: Check your API key or network connection.';
+      }
     } else {
       organizeBtn.disabled = false;
+      progressFill.classList.remove('animating');
+      resetBtn.style.display = 'none';
+    }
+
+    const taskList = document.getElementById('taskList');
+    taskList.innerHTML = '';
+    taskList.style.maxHeight = '150px';
+    taskList.style.overflowY = 'auto';
+    if (job.tasks) {
+      job.tasks.forEach(task => {
+        const taskElement = document.createElement('div');
+        taskElement.className = `task-item ${task.status}`;
+        const statusText = task.status === 'running' ? 'in progress' : task.status;
+        taskElement.innerHTML = `
+          <div class="task-status"></div>
+          <span>${task.name} - ${statusText}</span>
+        `;
+        taskList.appendChild(taskElement);
+      });
     }
   }
 
   function checkApiKey() {
       chrome.storage.sync.get(['openaiApiKey'], (result) => {
         if (!result.openaiApiKey) {
-          statusContainer.classList.add('visible');
+          statusPanel.classList.add('visible');
           statusText.classList.remove('updated');
           void statusText.offsetWidth;
           statusText.innerHTML = 'API Key not set. Please <a href="options.html" target="_blank">configure it</a>.';
@@ -158,34 +248,65 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  // When popup opens, immediately check for an ongoing job
+  // When popup opens, check for job status and force reset if stuck
   chrome.runtime.sendMessage({ action: "checkJobStatus" }, (job) => {
     if (chrome.runtime.lastError) {
-        console.warn("Could not check job status:", chrome.runtime.lastError.message);
+      console.warn("Could not check job status:", chrome.runtime.lastError.message);
+      // If we can't check status, assume no job and enable button
+      updateUi(null);
+      return;
     }
+    
+    // Check if job is stuck (older than 10 minutes)
+    if (job && job.status === 'running' && job.startTime) {
+      const elapsed = Date.now() - job.startTime;
+      const tenMinutes = 10 * 60 * 1000;
+      
+      if (elapsed > tenMinutes) {
+        console.warn('🚨 Detected stuck job older than 10 minutes, force resetting...');
+        chrome.runtime.sendMessage({ action: 'emergencyStop' }, (response) => {
+          console.log('Force reset result:', response);
+          updateUi(null);
+          statusText.textContent = '⚠️ Stuck job cleared - you can now organize bookmarks';
+          statusPanel.classList.add('visible');
+        });
+        return;
+      }
+    }
+    
     updateUi(job);
   });
 
   organizeBtn.addEventListener('click', () => {
     // Check API key before starting
-    chrome.storage.sync.get(['openaiApiKey'], (result) => {
+    chrome.storage.sync.get(['openaiApiKey', 'selectedModel'], (result) => {
       if (!result.openaiApiKey || result.openaiApiKey.trim() === '') {
         updateUi({ status: 'error', message: 'Please set your OpenAI API key in options first.' });
         return;
       }
       
+      const selectedModel = result.selectedModel || 'gpt-4';
+      
       // This message starts the whole process in the background script
-      chrome.runtime.sendMessage({ action: "organizeBookmarks" }, (response) => {
+      chrome.runtime.sendMessage({ 
+        action: "organizeBookmarks", 
+        model: selectedModel 
+      }, (response) => {
         if (chrome.runtime.lastError) {
           console.error('Failed to start organization:', chrome.runtime.lastError.message);
           updateUi({ status: 'error', message: 'Failed to start organization process.' });
+          return;
+        }
+        
+        if (!response || !response.success) {
+          updateUi({ status: 'error', message: response?.error || 'Failed to start organization process.' });
         }
       });
     });
   });
 
   // Listen for status updates from the background script
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
     if (request.action === 'updateStatus') {
         updateUi(request.job);
         sendResponse({ received: true });
@@ -193,115 +314,89 @@ document.addEventListener('DOMContentLoaded', () => {
     // Don't return true unless we're handling async response
   });
 
+  // Force show debug buttons if they exist but are hidden
+  if (debugBtn) {
+    debugBtn.style.display = 'block';
+    debugBtn.style.visibility = 'visible';
+    console.log('✅ Debug button forced visible');
+  }
+  
+  if (forceUnlockBtn) {
+    forceUnlockBtn.style.display = 'block';
+    forceUnlockBtn.style.visibility = 'visible';
+    console.log('✅ Force unlock button forced visible');
+  }
+
   checkApiKey(); // Initial check
+
+  const resetBtn = document.getElementById('resetBtn');
+  resetBtn.addEventListener('click', () => {
+    chrome.runtime.sendMessage({ action: 'resetJob' });
+    updateUi(null);
+  });
+
+  // Emergency stop button
+  const emergencyStopBtn = document.getElementById('emergencyStopBtn');
+  emergencyStopBtn.addEventListener('click', () => {
+    console.log('🚨 Emergency stop requested by user');
+    chrome.runtime.sendMessage({ action: 'emergencyStop' }, (response) => {
+      if (response && response.success) {
+        console.log('✅ Emergency stop successful:', response.message);
+        updateUi(null);
+        statusText.textContent = '🚨 Processing stopped by user';
+        statusPanel.classList.add('visible');
+      } else {
+        console.error('❌ Emergency stop failed:', response?.error);
+      }
+    });
+  });
+
+  // Debug button event listener
+  debugBtn.addEventListener('click', () => {
+    console.log('🔍 Debug bookmarks requested');
+    chrome.runtime.sendMessage({ action: 'debugBookmarks' }, (response) => {
+      if (response && response.success) {
+        console.log('📊 Bookmark Debug Results:', response);
+        statusText.innerHTML = `
+          📊 Total bookmarks: ${response.totalBookmarks}<br>
+          📁 AI organized folders: ${response.organizedFolders}<br>
+          ${response.folders.map(f => `📁 "${f.title}"`).join('<br>')}
+        `;
+        statusPanel.classList.add('visible');
+      } else {
+        console.error('❌ Debug failed:', response?.error);
+        statusText.textContent = '❌ Debug failed: ' + (response?.error || 'Unknown error');
+        statusPanel.classList.add('visible');
+      }
+    });
+  });
+
+  // Force unlock button event listener
+  forceUnlockBtn.addEventListener('click', () => {
+    console.log('🔓 Force unlock requested');
+    
+    // Force clear everything
+    chrome.runtime.sendMessage({ action: 'emergencyStop' }, (response) => {
+      console.log('Emergency stop result:', response);
+      
+      // Clear storage manually
+      chrome.storage.local.clear(() => {
+        console.log('✅ All local storage cleared');
+        
+        // Reset UI
+        organizeBtn.disabled = false;
+        statusText.textContent = '🔓 Extension unlocked - ready to organize bookmarks';
+        statusPanel.classList.add('visible');
+        statusPanel.classList.remove('running', 'error');
+        resetBtn.style.display = 'none';
+        emergencyStopBtn.style.display = 'none';
+        progressContainer.classList.remove('visible');
+        
+        console.log('✅ UI reset complete');
+      });
+    });
+  });
 });
 
-// 1. Function to recursively get all bookmarks
-async function getAllBookmarks() {
-  return new Promise((resolve) => {
-    chrome.bookmarks.getTree((bookmarkTreeNodes) => {
-      const bookmarks = [];
-      function flatten(nodes) {
-        for (const node of nodes) {
-          if (node.url) { // It's a bookmark, not a folder
-            bookmarks.push({ id: node.id, title: node.title, url: node.url });
-          }
-          if (node.children) {
-            flatten(node.children);
-          }
-        }
-      }
-      flatten(bookmarkTreeNodes);
-      resolve(bookmarks);
-    });
-  });
-}
-
-// 2. Function to send data to OpenAI API
-async function getCategoriesFromAI(bookmarks, apiKey) {
-  const simplifiedBookmarks = bookmarks.map(({ title, url }) => ({ title, url }));
-
-  // This prompt is CRITICAL. It instructs the AI to return a specific JSON format.
-  const prompt = `
-    You are an expert bookmark organizer. I will provide you with a list of my bookmarks in JSON format.
-    Your task is to categorize them into a few, sensible, top-level folders.
-    Common categories could be "Programming", "News & Articles", "Shopping", "Social Media", "Tools & Utilities", "Entertainment", "Finance", "Travel", etc. Try to use a small, efficient set of categories.
-    
-    IMPORTANT: Your response MUST be a valid JSON object. It should be a single object with one key: "categories".
-    The value of "categories" should be an array of objects, where each object has a "category" name and a "urls" array containing the original URLs that belong to that category.
-    
-    Example response format:
-    {
-      "categories": [
-        {
-          "category": "Programming",
-          "urls": ["https://stackoverflow.com/questions/123", "https://www.freecodecamp.org/"]
-        },
-        {
-          "category": "Shopping",
-          "urls": ["https://www.amazon.com/"]
-        }
-      ]
-    }
-
-    Do not include any other text, explanations, or markdown formatting in your response. Only the JSON object.
-
-    Here are the bookmarks:
-    ${JSON.stringify(simplifiedBookmarks)}
-  `;
-
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: 'gpt-3.5-turbo-1106', // This model is good at following JSON format instructions
-      messages: [{ role: 'user', content: prompt }],
-      response_format: { "type": "json_object" } // Enforce JSON mode
-    })
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(`AI API Error: ${errorData.error.message}`);
-  }
-
-  const data = await response.json();
-  const content = JSON.parse(data.choices[0].message.content);
-  return content.categories; // Directly return the array of categories
-}
-
-
-// 3. Function to create folders and move bookmarks
-async function applyOrganization(categories) {
-  // Create one main folder to hold all the organized bookmarks
-  const parentFolder = await chrome.bookmarks.create({
-    parentId: '1', // '1' is the ID for the Bookmarks Bar
-    title: `AI Organized Bookmarks (${new Date().toLocaleDateString()})`
-  });
-
-  const urlToIdMap = new Map();
-  const allBookmarks = await getAllBookmarks();
-  allBookmarks.forEach(bm => urlToIdMap.set(bm.url, bm.id));
-
-  for (const item of categories) {
-    const categoryName = item.category;
-    const urls = item.urls;
-    
-    // Create a new folder for this category inside our main folder
-    const categoryFolder = await chrome.bookmarks.create({
-      parentId: parentFolder.id,
-      title: categoryName
-    });
-
-    for (const url of urls) {
-      const bookmarkId = urlToIdMap.get(url);
-      if (bookmarkId) {
-        // Move the bookmark into the new category folder
-        await chrome.bookmarks.move(bookmarkId, { parentId: categoryFolder.id });
-      }
-    }
-  }
-} 
+// Note: All bookmark processing logic has been moved to background.js for better architecture.
+// The popup now focuses solely on UI interactions and status updates. 
