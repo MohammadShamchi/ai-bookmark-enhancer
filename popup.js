@@ -54,6 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const statusText = statusPanel.querySelector('.status-text');
   const progressContainer = statusPanel.querySelector('.progress-container');
   const progressFill = statusPanel.querySelector('.progress-fill');
+  const circularProgress = statusPanel.querySelector('.circular-progress .progress-circle');
+  const progressText = statusPanel.querySelector('.progress-text');
   
   // Model selection functionality
   const modelBadge = document.getElementById('modelBadge');
@@ -77,17 +79,81 @@ document.addEventListener('DOMContentLoaded', () => {
     soundManager.playSound('click');
   });
 
+  // Model dropdown positioning function
+  function positionDropdown() {
+    const badge = document.getElementById('modelBadge');
+    const dropdown = document.getElementById('modelDropdown');
+    if (!badge || !dropdown) return;
+    
+    // Move dropdown to body if not already there (escape stacking context)
+    if (dropdown.parentElement !== document.body) {
+      document.body.appendChild(dropdown);
+    }
+    
+    const rect = badge.getBoundingClientRect();
+    
+    // Calculate position relative to viewport with scroll offsets
+    const top = rect.bottom + window.scrollY + 4;
+    const left = rect.right + window.scrollX - 160; // 160px is min-width of dropdown
+    
+    // Boundary checking - ensure dropdown stays within popup bounds
+    const dropdownHeight = dropdown.offsetHeight || 200; // fallback height
+    const dropdownWidth = dropdown.offsetWidth || 160;
+    const popupHeight = window.innerHeight;
+    const popupWidth = window.innerWidth;
+    
+    // Adjust if would overflow bottom
+    const adjustedTop = top + dropdownHeight > popupHeight ? 
+      rect.top + window.scrollY - dropdownHeight - 4 : top;
+    
+    // Adjust if would overflow right
+    const adjustedLeft = left + dropdownWidth > popupWidth ? 
+      popupWidth - dropdownWidth - 8 : left;
+    
+    dropdown.style.top = `${adjustedTop}px`;
+    dropdown.style.left = `${adjustedLeft}px`;
+  }
+
   // Model dropdown toggle
   modelBadge.addEventListener('click', (e) => {
     e.stopPropagation();
-    modelDropdown.classList.toggle('show');
+    if (modelDropdown.classList.contains('show')) {
+      originalCloseDropdown();
+    } else {
+      positionDropdown(); // Position before showing
+      modelDropdown.classList.add('show');
+    }
     soundManager.playSound('click', 0.3);
   });
+  
+  // Reposition on window resize and ensure proper cleanup
+  window.addEventListener('resize', () => {
+    if (modelDropdown.classList.contains('show')) {
+      positionDropdown();
+    }
+  });
+  
+  // Cleanup: Move dropdown back to original parent when hidden
+  const originalDropdownParent = modelDropdown.parentElement;
+  const originalDropdownNextSibling = modelDropdown.nextSibling;
+  
+  // Override the existing close logic to restore DOM position
+  const originalCloseDropdown = () => {
+    modelDropdown.classList.remove('show');
+    // Move back to original position if it was moved to body
+    if (modelDropdown.parentElement === document.body && originalDropdownParent) {
+      if (originalDropdownNextSibling) {
+        originalDropdownParent.insertBefore(modelDropdown, originalDropdownNextSibling);
+      } else {
+        originalDropdownParent.appendChild(modelDropdown);
+      }
+    }
+  };
 
   // Close dropdown when clicking outside
   document.addEventListener('click', (e) => {
-    if (!modelBadge.contains(e.target)) {
-      modelDropdown.classList.remove('show');
+    if (!modelBadge.contains(e.target) && !modelDropdown.contains(e.target)) {
+      originalCloseDropdown();
     }
   });
 
@@ -110,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
       chrome.storage.sync.set({ selectedModel: modelName });
       
       // Close dropdown
-      modelDropdown.classList.remove('show');
+      originalCloseDropdown();
       
       soundManager.playSound('click', 0.4);
     });
@@ -137,6 +203,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  function updateCircularProgress(percentage) {
+    const circumference = 2 * Math.PI * 40; // radius = 40
+    const offset = circumference - (percentage / 100) * circumference;
+    
+    if (circularProgress) {
+      circularProgress.style.strokeDashoffset = offset;
+    }
+    if (progressText) {
+      progressText.textContent = `${Math.round(percentage)}%`;
+    }
+  }
+
   function updateUi(job) {
     // Reset status panel classes
     statusPanel.classList.remove('visible', 'running', 'success', 'error');
@@ -151,6 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
       statusText.textContent = '';
       organizeBtn.disabled = false;
       progressFill.style.width = '0%';
+      updateCircularProgress(0);
       resetBtn.style.display = 'none';
       emergencyStopBtn.style.display = 'none'; // Hide emergency stop when no job
       checkApiKey();
@@ -177,15 +256,18 @@ document.addEventListener('DOMContentLoaded', () => {
       organizeBtn.disabled = true;
       statusPanel.classList.add('running');
       progressContainer.classList.add('visible');
-      progressFill.style.width = `${job.progress || 0}%`;
+      const progress = job.progress || 0;
+      progressFill.style.width = `${progress}%`;
+      updateCircularProgress(progress);
       resetBtn.style.display = 'none';
       emergencyStopBtn.style.display = 'block'; // Show emergency stop during processing
       soundManager.playSound('processing', 0.1);
       
       // Update progress if available
       if (job.chunkIndex && job.totalChunks) {
-        const progress = (job.chunkIndex / job.totalChunks) * 100;
-        progressFill.style.width = `${progress}%`;
+        const chunkProgress = (job.chunkIndex / job.totalChunks) * 100;
+        progressFill.style.width = `${chunkProgress}%`;
+        updateCircularProgress(chunkProgress);
       }
       if (job.message && job.message.includes('Processing')) {
         progressFill.classList.add('animating');
@@ -196,6 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
       organizeBtn.disabled = false;
       statusPanel.classList.add('success');
       progressFill.style.width = '100%';
+      updateCircularProgress(100);
       resetBtn.style.display = 'none';
       emergencyStopBtn.style.display = 'none'; // Hide emergency stop when complete
       soundManager.playSound('success');
@@ -208,6 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
       organizeBtn.disabled = false;
       statusPanel.classList.add('error');
       progressFill.style.width = '0%';
+      updateCircularProgress(0);
       resetBtn.style.display = 'block';
       emergencyStopBtn.style.display = 'none'; // Hide emergency stop on error
       soundManager.playSound('error');
@@ -220,20 +304,80 @@ document.addEventListener('DOMContentLoaded', () => {
       resetBtn.style.display = 'none';
     }
 
-    const taskList = document.getElementById('taskList');
-    taskList.innerHTML = '';
-    taskList.style.maxHeight = '150px';
-    taskList.style.overflowY = 'auto';
-    if (job.tasks) {
+    const statusCards = document.getElementById('statusCards');
+    statusCards.innerHTML = '';
+    
+    // Create premium status cards if tasks exist
+    if (job.tasks && job.tasks.length > 0) {
       job.tasks.forEach(task => {
-        const taskElement = document.createElement('div');
-        taskElement.className = `task-item ${task.status}`;
-        const statusText = task.status === 'running' ? 'in progress' : task.status;
-        taskElement.innerHTML = `
-          <div class="task-status"></div>
-          <span>${task.name} - ${statusText}</span>
+        const statusCard = document.createElement('div');
+        statusCard.className = `status-card ${task.status}`;
+        
+        // Determine icon based on task type and status
+        let icon = '●';
+        if (task.status === 'complete') icon = '✓';
+        else if (task.status === 'running') icon = '⚡';
+        else if (task.status === 'error') icon = '⚠';
+        
+        // Determine description based on status
+        let description = 'Pending';
+        if (task.status === 'running') description = 'In progress...';
+        else if (task.status === 'complete') description = 'Completed successfully';
+        else if (task.status === 'error') description = 'Failed - retrying';
+        
+        statusCard.innerHTML = `
+          <div class="status-card-icon">${icon}</div>
+          <div class="status-card-content">
+            <div class="status-card-title">${task.name}</div>
+            <div class="status-card-description">${description}</div>
+          </div>
+          <svg class="status-card-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 6L9 17l-5-5"></path>
+          </svg>
         `;
-        taskList.appendChild(taskElement);
+        statusCards.appendChild(statusCard);
+      });
+    } else {
+      // Show default status cards for common processing steps
+      const defaultSteps = [
+        { name: 'API Validation', status: job.status === 'running' ? 'complete' : 'pending' },
+        { name: 'Bookmark Analysis', status: job.status === 'running' ? 'running' : 'pending' },
+        { name: 'AI Processing', status: 'pending' },
+        { name: 'Organization', status: 'pending' }
+      ];
+      
+      defaultSteps.forEach((step, index) => {
+        const statusCard = document.createElement('div');
+        let cardStatus = step.status;
+        
+        // Update status based on job progress
+        if (job.status === 'running' && job.progress) {
+          const progress = job.progress;
+          if (progress > index * 25) cardStatus = 'complete';
+          else if (progress > (index - 1) * 25) cardStatus = 'running';
+        }
+        
+        statusCard.className = `status-card ${cardStatus}`;
+        
+        let icon = '●';
+        if (cardStatus === 'complete') icon = '✓';
+        else if (cardStatus === 'running') icon = '⚡';
+        
+        let description = 'Pending';
+        if (cardStatus === 'running') description = 'In progress...';
+        else if (cardStatus === 'complete') description = 'Completed successfully';
+        
+        statusCard.innerHTML = `
+          <div class="status-card-icon">${icon}</div>
+          <div class="status-card-content">
+            <div class="status-card-title">${step.name}</div>
+            <div class="status-card-description">${description}</div>
+          </div>
+          <svg class="status-card-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 6L9 17l-5-5"></path>
+          </svg>
+        `;
+        statusCards.appendChild(statusCard);
       });
     }
   }
