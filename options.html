@@ -1,146 +1,140 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Bookmark Organizer - Settings</title>
-  <link rel="stylesheet" href="options.css">
+  <title>AI Bookmark Enhancer - Settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <div class="background-effects">
-    <div class="mesh-gradient"></div>
-    <div class="floating-particles"></div>
-    <div class="glass-reflections"></div>
+<body class="min-h-screen antialiased bg-[#0f172a] text-slate-100 font-[Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto] selection:bg-indigo-500/30 selection:text-white">
+  <!-- Background Mesh Gradient -->
+  <div class="fixed inset-0 -z-10 overflow-hidden">
+    <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full blur-3xl opacity-30 bg-gradient-to-tr from-indigo-600 via-purple-600 to-indigo-700 animate-pulse"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[36rem] h-[36rem] rounded-full blur-3xl opacity-20 bg-gradient-to-br from-purple-600 via-indigo-600 to-purple-700"></div>
+    <div class="absolute bottom-0 right-0 w-80 h-80 rounded-full blur-3xl opacity-25 bg-cyan-500/30"></div>
+    <div class="absolute top-10 right-20 w-48 h-48 rounded-full blur-2xl opacity-20 bg-indigo-400/40 animate-pulse"></div>
   </div>
-  
-  <div class="container">
-    <div class="back-button">
-      <a href="#" onclick="window.close()" class="back-link">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M19 12H5m7-7l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span>Back to Extension</span>
-      </a>
-    </div>
-    
-    <header class="page-header">
-      <div class="header-icon">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <div class="header-content">
-        <h1>AI Bookmark Organizer</h1>
-        <p>Configure your OpenAI API key for intelligent bookmark organization</p>
-      </div>
-    </header>
-    
-    <div class="main-content">
-      <div class="config-card">
-        <div class="card-header">
-          <div class="header-icon-small">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- App Wrapper -->
+  <div class="mx-auto my-8 flex items-center justify-center">
+    <!-- Settings Container (600x700) -->
+    <section class="w-[600px] h-[700px] bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.45)] relative overflow-hidden flex flex-col">
+      <!-- Header -->
+      <header class="px-5 pt-5 pb-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="h-9 w-9 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center">
+            <!-- lucide:sliders -->
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="text-indigo-300" aria-hidden="true">
+              <path d="M21 4H14M10 4H3M21 12H12M8 12H3M21 20H16M12 20H3M14 2v4M8 10v4M16 18v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
             </svg>
           </div>
-          <h2>API Configuration</h2>
+          <div>
+            <h2 class="text-[20px] tracking-tight font-semibold text-white">Settings</h2>
+            <p class="text-xs text-slate-400">Configure API access & preferences</p>
+          </div>
         </div>
-        
-        <div class="form-section">
-          <div class="input-group">
-            <label for="apiKey">OpenAI API Key</label>
-            <div class="input-wrapper">
-              <input type="password" id="apiKey" placeholder="sk-proj-..." autocomplete="off">
-              <button type="button" class="toggle-visibility" id="toggleBtn">
-                <svg class="eye-icon" viewBox="0 0 24 24" fill="none">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.5"/>
-                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
+        <button onclick="window.close()" class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm text-slate-200 hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:ring-offset-1 focus:ring-offset-slate-900">
+          Back
+        </button>
+      </header>
+      <div class="px-5 pb-5 flex-1 overflow-y-auto">
+        <!-- API Key -->
+        <section class="mb-5 space-y-3">
+          <h3 class="text-sm font-medium tracking-tight">API Key Configuration</h3>
+          <div class="p-[1.5px] rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600">
+            <div class="rounded-xl bg-white/10 border border-white/10 p-4">
+              <label for="apiKey" class="block text-xs text-slate-300 mb-2">OpenAI API Key</label>
+              <div class="flex items-center gap-2">
+                <input id="apiKey" type="password" placeholder="sk-********************************" class="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:ring-offset-1 focus:ring-offset-slate-900 text-slate-100" aria-label="OpenAI API Key">
+                <button id="toggleBtn" class="p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:ring-offset-1 focus:ring-offset-slate-900" aria-label="Show or hide API key">
+                  <!-- lucide:eye -->
+                  <svg id="eyeOpen" width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-slate-300" aria-hidden="true">
+                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"></circle>
+                  </svg>
+                  <!-- lucide:eye-off -->
+                  <svg id="eyeClosed" width="18" height="18" viewBox="0 0 24 24" fill="none" class="hidden text-slate-300" aria-hidden="true">
+                    <path d="M17.94 17.94A10.94 10.94 0 0112 20c-6.5 0-10-8-10-8a21.7 21.7 0 015.06-6.26M9.9 4.24A10.94 10.94 0 0112 4c6.5 0 10 8 10 8a21.68 21.68 0 01-4.37 5.94M1 1l22 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- Help Accordion -->
+        <section class="mb-5">
+          <div class="p-[1.5px] rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600">
+            <div class="rounded-xl bg-white/10 border border-white/10">
+              <button id="helpToggle" class="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-white/10 rounded-xl transition">
+                <div class="flex items-center gap-2">
+                  <!-- lucide:help-circle -->
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-indigo-300" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+                    <path d="M9.09 9a3 3 0 115.83 1c0 2-3 2-3 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                    <path d="M12 17h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                  </svg>
+                  <span class="text-sm font-medium tracking-tight">How to get your API key</span>
+                </div>
+                <!-- chevron -->
+                <svg id="helpChevron" width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-slate-400 transition-transform" aria-hidden="true">
+                  <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
                 </svg>
               </button>
-            </div>
-            <div class="input-help">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              Your API key is stored securely in your browser and never transmitted to our servers.
-            </div>
-          </div>
-          
-          <button id="saveBtn" class="primary-button">
-            <div class="button-content">
-              <div class="button-icon">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  <polyline points="17,21 17,13 7,13 7,21" stroke="currentColor" stroke-width="1.5"/>
-                  <polyline points="7,3 7,8 15,8" stroke="currentColor" stroke-width="1.5"/>
-                </svg>
+              <div id="helpPanel" class="px-4 pb-4 pt-0 transition-all overflow-hidden max-h-0">
+                <ol class="list-decimal list-inside text-sm text-slate-300 space-y-1">
+                  <li>Sign in to your account on the OpenAI platform.</li>
+                  <li>Navigate to the API Keys section in your dashboard.</li>
+                  <li>Create a new secret key and copy it securely.</li>
+                  <li>Paste it above and press Save. Keep it private.</li>
+                </ol>
+                <a href="https://platform.openai.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 mt-3 text-sm text-indigo-300 hover:text-indigo-200 underline underline-offset-4">
+                  Visit OpenAI Platform
+                  <!-- lucide:external-link -->
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M18 13v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                    <path d="M15 3h6v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                    <path d="M10 14L21 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                  </svg>
+                </a>
               </div>
-              <span>Save Configuration</span>
             </div>
-            <div class="button-shimmer"></div>
-          </button>
-          
-          <div id="message" class="message-panel">
-            <div class="message-indicator"></div>
-            <div class="message-text"></div>
           </div>
-        </div>
-      </div>
-      
-      <div class="help-card">
-        <div class="card-header">
-          <div class="header-icon-small">
-            <svg viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M12 17h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Security Notice -->
+        <section class="mb-5">
+          <div class="rounded-xl bg-amber-500/10 border border-amber-500/20 px-4 py-3 flex items-start gap-3">
+            <!-- lucide:shield -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-amber-300 mt-0.5" aria-hidden="true">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path>
             </svg>
+            <p class="text-xs text-amber-200">
+              Your API key is stored locally and used only to call the API from this extension. Never share your key.
+            </p>
           </div>
-          <h3>How to get your API key</h3>
-        </div>
-        
-        <div class="help-content">
-          <ol class="step-list">
-            <li>
-              <div class="step-content">
-                <span>Visit <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">OpenAI API Keys</a></span>
-              </div>
-            </li>
-            <li>
-              <div class="step-content">
-                <span>Create a new account or sign in</span>
-              </div>
-            </li>
-            <li>
-              <div class="step-content">
-                <span>Click "Create new secret key"</span>
-              </div>
-            </li>
-            <li>
-              <div class="step-content">
-                <span>Copy the key and paste it above</span>
-              </div>
-            </li>
-          </ol>
-          
-          <div class="security-note">
-            <div class="note-icon">
-              <svg viewBox="0 0 24 24" fill="none">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" stroke-width="1.5"/>
-                <circle cx="12" cy="16" r="1" fill="currentColor"/>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </section>
+
+        <!-- Save -->
+        <section class="mb-8">
+          <button id="saveBtn" class="w-full group relative overflow-hidden rounded-xl px-4 py-2.5 text-sm font-semibold tracking-tight text-white bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg hover:shadow-indigo-900/40 transition transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:ring-offset-1 focus:ring-offset-slate-900">
+            <span class="relative z-10 flex items-center justify-center gap-2">
+              <!-- lucide:save -->
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path>
+                <path d="M17 21v-8H7v8M7 3v5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
               </svg>
-            </div>
-            <div class="note-content">
-              <strong>Secure & Private</strong>
-              <span>Your API key is encrypted and stored locally in your browser. It's never shared with us or any third parties.</span>
-            </div>
-          </div>
-        </div>
+              Save
+            </span>
+          </button>
+        </section>
       </div>
-    </div>
+
+      <!-- Slide-in Messages -->
+      <div id="toastWrap" class="pointer-events-none absolute top-4 right-4 space-y-2"></div>
+    </section>
   </div>
 
   <script src="options.js"></script>
 </body>
-</html> 
+</html>

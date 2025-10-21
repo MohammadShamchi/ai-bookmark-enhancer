@@ -1,142 +1,240 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Bookmark Organizer</title>
-  <link rel="stylesheet" href="popup.css">
+  <title>AI Bookmark Enhancer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-  <div class="background-effects">
-    <div class="mesh-gradient"></div>
-    <div class="floating-particles"></div>
-    <div class="glass-reflections"></div>
+<body class="min-h-screen antialiased bg-[#0f172a] text-slate-100 font-[Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto]">
+  <!-- Background Effects -->
+  <div class="fixed inset-0 -z-10 overflow-hidden">
+    <!-- Gradient blob 1 (top-left) -->
+    <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full blur-3xl opacity-30 bg-gradient-to-tr from-indigo-600 via-purple-600 to-indigo-700 animate-pulse"></div>
+    <!-- Gradient blob 2 (center) -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[36rem] h-[36rem] rounded-full blur-3xl opacity-20 bg-gradient-to-br from-purple-600 via-indigo-600 to-purple-700"></div>
+    <!-- Gradient blob 3 (bottom-right) -->
+    <div class="absolute bottom-0 right-0 w-80 h-80 rounded-full blur-3xl opacity-25 bg-cyan-500/30"></div>
+    <!-- Gradient blob 4 (top-right) -->
+    <div class="absolute top-10 right-20 w-48 h-48 rounded-full blur-2xl opacity-20 bg-indigo-400/40 animate-pulse"></div>
   </div>
-  
-  <div class="container">
-    <div class="status-indicator">
-      <div class="status-dot ai-ready"></div>
-      <span class="status-label">AI Assistant Ready</span>
-      <div class="model-badge" id="modelBadge">
-        <span id="selectedModel">GPT-4.1 Mini</span>
-        <div class="model-dropdown" id="modelDropdown">
-          <div class="model-option selected" data-model="gpt-4.1-mini">
-            <span class="model-name">GPT-4.1 Mini</span>
-            <span class="model-badge">Recommended</span>
-            <svg class="model-check" viewBox="0 0 24 24" fill="none">
-              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="model-option" data-model="gpt-4.1">
-            <span class="model-name">GPT-4.1</span>
-            <span class="model-badge">Premium</span>
-            <svg class="model-check" viewBox="0 0 24 24" fill="none">
-              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="model-option" data-model="gpt-4o-mini">
-            <span class="model-name">GPT-4o Mini</span>
-            <span class="model-badge">Budget</span>
-            <svg class="model-check" viewBox="0 0 24 24" fill="none">
-              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="model-option" data-model="gpt-4.1-nano">
-            <span class="model-name">GPT-4.1 Nano</span>
-            <span class="model-badge">Fastest</span>
-            <svg class="model-check" viewBox="0 0 24 24" fill="none">
-              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="model-option" data-model="gpt-4-turbo">
-            <span class="model-name">GPT-4 Turbo</span>
-            <span class="model-badge">Legacy</span>
-            <svg class="model-check" viewBox="0 0 24 24" fill="none">
-              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-      <svg class="settings-icon-header" id="settingsIcon" viewBox="0 0 24 24" fill="none">
-        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.5"/>
-        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
-      </svg>
-    </div>
-    
-    <div class="main-card">
-      <div class="card-header">
-        <div class="app-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
-          </svg>
-        </div>
-        <div class="header-content">
-          <h1>Organize Bookmarks</h1>
-          <p>AI-powered bookmark organization</p>
-        </div>
-      </div>
-      
-      <div class="card-body">
-        <button id="organizeBtn" class="primary-button">
-          <div class="button-content">
-            <div class="button-icon">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- App Root -->
+  <div id="appRoot" class="mx-auto my-8 flex items-center justify-center">
+    <!-- Popup View Container -->
+    <section id="popupView" class="w-[360px] h-[500px] bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.45)] relative overflow-hidden flex flex-col">
+      <!-- Header Section -->
+      <header class="px-4 pt-4 pb-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="h-8 w-8 rounded-lg bg-white/10 border border-white/10 flex items-center justify-center shadow-inner">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-indigo-300" aria-hidden="true">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
               </svg>
             </div>
-            <span>Organize My Bookmarks</span>
+            <div class="leading-tight">
+              <h1 class="text-[18px] tracking-tight font-semibold text-white">AI Bookmark Enhancer</h1>
+              <p class="text-xs text-slate-400">Intelligent bookmark organization powered by OpenAI</p>
+            </div>
           </div>
-          <div class="button-shimmer"></div>
+          <button id="openSettingsTop" class="p-2 rounded-lg hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 transition" title="Open Settings">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-slate-300" aria-hidden="true">
+              <path d="M12 15.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z" stroke="currentColor" stroke-width="1.5"></path>
+              <path d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.07a2 2 0 01-2.83 2.83l-.07-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.54V21a2 2 0 01-4 0v-.09a1.7 1.7 0 00-1-1.54 1.7 1.7 0 00-1.87.34l-.07.06a2 2 0 01-2.83-2.83l.06-.07a1.7 1.7 0 00.34-1.87 1.7 1.7 0 00-1.54-1H3a2 2 0 010-4h.09a1.7 1.7 0 001.54-1 1.7 1.7 0 00-.34-1.87l-.06-.07A2 2 0 015.06 3.4l.07.06a1.7 1.7 0 001.87.34H7a1.7 1.7 0 001-1.54V2a2 2 0 014 0v.09a1.7 1.7 0 001 1.54h.06a1.7 1.7 0 001.87-.34l.07-.06a2 2 0 012.83 2.83l-.06.07a1.7 1.7 0 00-.34 1.87v.06A1.7 1.7 0 0021 12h.09a2 2 0 010 4H21a1.7 1.7 0 00-1.6-.94h-.06z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Status Bar -->
+      <div class="mt-3 flex items-center gap-2 px-4">
+        <div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+          </span>
+          <span class="text-[11px] leading-none font-medium text-emerald-300">AI Ready</span>
+        </div>
+        <div id="activeModelChip" class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-medium text-slate-200">GPT-4.1 Mini</div>
+        <button id="debugBtn" class="ml-auto px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-medium text-slate-200 hover:bg-white/10 transition">Debug</button>
+      </div>
+
+      <!-- Main Content Area -->
+      <main class="px-3 py-2 flex-1 overflow-hidden">
+        <!-- Main Glass Card -->
+        <div class="p-[1.5px] rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600">
+          <div class="rounded-2xl bg-white/10 backdrop-blur-2xl border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.35)]">
+            <div class="p-4">
+              <!-- Primary Controls -->
+              <div id="primaryControls" class="space-y-4">
+                <button id="organizeBtn" class="w-full group relative overflow-hidden rounded-xl px-4 py-3 text-sm font-semibold tracking-tight text-white bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg hover:shadow-indigo-900/40 transition transform hover:scale-[1.02]">
+                  <span class="relative z-10 flex items-center justify-center gap-2">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="opacity-90" aria-hidden="true">
+                      <path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5L12 3z" stroke="currentColor" stroke-width="1.5"></path>
+                      <path d="M19 13l.75 1.75L21.5 15.5 19.75 16.25 19 18 18.25 16.25 16.5 15.5l1.75-.75L19 13z" stroke="currentColor" stroke-width="1.5"></path>
+                      <path d="M6 14l.9 2.1L9 17l-2.1.9L6 20l-.9-2.1L3 17l2.1-.9L6 14z" stroke="currentColor" stroke-width="1.5"></path>
+                    </svg>
+                    Organize My Bookmarks
+                  </span>
+                  <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition"></div>
+                </button>
+
+                <!-- Model Selector -->
+                <div class="relative">
+                  <button id="modelBtn" class="w-full flex items-center justify-between rounded-xl bg-white/5 border border-white/10 px-3 py-2.5 text-sm text-slate-200 hover:bg-white/10 transition transform hover:scale-[1.01]">
+                    <div class="flex items-center gap-2">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-indigo-300" aria-hidden="true">
+                        <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.5"></rect>
+                        <rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"></rect>
+                        <path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                      </svg>
+                      <span class="font-medium">Model</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span id="modelLabel" class="text-slate-300">GPT-4.1 Mini</span>
+                      <svg id="modelChevron" width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-slate-400 transition-transform" aria-hidden="true">
+                        <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                    </div>
+                  </button>
+
+                  <!-- Model Menu -->
+                  <div id="modelMenu" class="hidden absolute z-20 mt-2 w-full rounded-xl bg-slate-900/95 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden">
+                    <ul class="py-1 text-sm">
+                      <li><button data-model="GPT-4.1 Mini" class="w-full text-left px-3 py-2 hover:bg-white/10 transition flex items-center justify-between"><span>GPT-4.1 Mini</span></button></li>
+                      <li><button data-model="GPT-4.1" class="w-full text-left px-3 py-2 hover:bg-white/10 transition">GPT-4.1</button></li>
+                      <li><button data-model="GPT-4o Mini" class="w-full text-left px-3 py-2 hover:bg-white/10 transition">GPT-4o Mini</button></li>
+                      <li><button data-model="GPT-4.1 Nano" class="w-full text-left px-3 py-2 hover:bg-white/10 transition">GPT-4.1 Nano</button></li>
+                      <li><button data-model="GPT-4 Turbo" class="w-full text-left px-3 py-2 hover:bg-white/10 transition">GPT-4 Turbo</button></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Progress Panel -->
+              <div id="progressPanel" class="hidden">
+                <div class="mt-1 mb-3 flex items-center gap-2">
+                  <div class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></div>
+                  <p id="statusText" class="text-sm text-slate-300">Preparing AI pipeline…</p>
+                </div>
+
+                <!-- Circular Progress -->
+                <div class="flex items-center gap-4">
+                  <div class="relative">
+                    <svg id="progressRing" width="72" height="72" viewBox="0 0 120 120" class="drop-shadow">
+                      <defs>
+                        <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stop-color="#4f46e5"></stop>
+                          <stop offset="100%" stop-color="#7c3aed"></stop>
+                        </linearGradient>
+                      </defs>
+                      <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.08)" stroke-width="12" fill="none"></circle>
+                      <circle id="ringProgress" cx="60" cy="60" r="50" stroke="url(#ringGradient)" stroke-linecap="round" stroke-width="12" fill="none" stroke-dasharray="314" stroke-dashoffset="314" transform="rotate(-90 60 60)"></circle>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                      <span id="ringLabel" class="text-sm font-semibold">0%</span>
+                    </div>
+                  </div>
+
+                  <!-- Linear Progress & Stats -->
+                  <div class="flex-1 space-y-2">
+                    <div class="flex justify-between text-xs text-slate-400 mb-1">
+                      <span>Processing</span>
+                      <span id="progressPct">0%</span>
+                    </div>
+                    <div class="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                      <div id="progressBar" class="h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 rounded-full w-0 transition-all"></div>
+                    </div>
+
+                    <!-- Performance Stats -->
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                      <div class="rounded-lg bg-white/5 border border-white/10 px-2 py-1.5">
+                        <div class="text-slate-400">Chunks/sec</div>
+                        <div id="chunksRate" class="font-semibold text-slate-100">0.0</div>
+                      </div>
+                      <div class="rounded-lg bg-white/5 border border-white/10 px-2 py-1.5">
+                        <div class="text-slate-400">ETA</div>
+                        <div id="eta" class="font-semibold text-slate-100">--:--</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Task Queue -->
+                <div class="mt-4">
+                  <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm font-medium tracking-tight">Task Queue</h3>
+                    <div class="text-[11px] text-slate-400">Live updates</div>
+                  </div>
+                  <div id="taskList" class="h-24 overflow-y-auto pr-1 space-y-2">
+                    <!-- Tasks injected here -->
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-4 grid grid-cols-2 gap-2">
+                  <button id="stopBtn" class="group flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-600/20 text-red-300 border border-red-600/30 hover:bg-red-600/30 transition">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+                      <rect x="9" y="9" width="6" height="6" fill="currentColor" rx="1"></rect>
+                    </svg>
+                    <span>Emergency Stop</span>
+                    <span id="stopPulse" class="ml-1 h-2 w-2 rounded-full bg-red-400 animate-ping"></span>
+                  </button>
+                  <button id="resetBtn" class="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/5 text-slate-200 border border-white/10 hover:bg-white/10 transition">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M3 12a9 9 0 109-9v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                      <path d="M3 4v5h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                    Reset
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="px-4 py-3 flex items-center justify-between">
+        <button id="openSettings" class="text-sm text-slate-300 hover:text-white hover:underline underline-offset-4 rounded px-1">Settings</button>
+        <button id="infoBtn" class="p-2 rounded-lg hover:bg-white/10 transition" title="Show Information">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-slate-300" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+            <path d="M12 16v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            <path d="M12 8h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+          </svg>
         </button>
-        
-        <div id="status" class="status-panel">
-          <div class="status-content">
-            <div class="status-indicator-dot"></div>
-            <div class="status-text"></div>
-            <div id="statusCards" class="status-cards"></div>
-            <div id="taskList" class="task-list" style="display: none;"></div>
-          </div>
-          <div class="progress-container">
-            <div class="circular-progress">
-              <svg viewBox="0 0 84 84">
-                <defs>
-                  <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" style="stop-color:#1e3a8a"/>
-                    <stop offset="25%" style="stop-color:#4f46e5"/>
-                    <stop offset="75%" style="stop-color:#7c3aed"/>
-                    <stop offset="100%" style="stop-color:#a855f7"/>
-                  </linearGradient>
-                </defs>
-                <circle class="progress-circle-bg" cx="42" cy="42" r="40"/>
-                <circle class="progress-circle" cx="42" cy="42" r="40"/>
-              </svg>
-              <div class="progress-text">0%</div>
-            </div>
-            <div class="progress-track">
-              <div class="progress-fill"></div>
-            </div>
-          </div>
-          <button id="resetBtn" class="reset-button" style="display: none;">Reset</button>
-          <button id="emergencyStopBtn" class="emergency-stop-button" style="display: none;">🚨 EMERGENCY STOP</button>
-        </div>
+      </footer>
+    </section>
+  </div>
+
+  <!-- Debug Panel -->
+  <div id="debugPanel" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[360px] bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl p-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-cyan-300" aria-hidden="true">
+          <path d="M8 2l1 3h6l1-3M4 13h16M6 9h12M6 17h12M12 6v14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+          <rect x="7" y="6" width="10" height="12" rx="5" stroke="currentColor" stroke-width="1.5"></rect>
+        </svg>
+        <span class="text-sm font-medium">Debug</span>
       </div>
-      
-      <div class="card-footer">
-        <a href="options.html" target="_blank" class="settings-button">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.5"/>
-            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
-          </svg>
-          <span>Configure API Key</span>
-        </a>
-        <div class="button-group" style="display: none;">
-          <button id="debugBtn" class="debug-button">🔍 Debug Bookmarks</button>
-          <button id="forceUnlockBtn" class="force-unlock-button">🔓 Force Unlock</button>
-        </div>
-      </div>
+      <button id="closeDebug" class="p-1 rounded-lg hover:bg-white/10 transition" title="Close Debug Panel">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-slate-300" aria-hidden="true">
+          <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="mt-3 text-xs text-slate-300">
+      <div>Model: <span id="dbgModel" class="text-indigo-300">GPT-4.1 Mini</span></div>
+      <div>Status: <span id="dbgStatus" class="text-indigo-300">Idle</span></div>
+      <div>Progress: <span id="dbgProgress" class="text-indigo-300">0%</span></div>
     </div>
   </div>
-  
+
   <script src="popup.js"></script>
 </body>
-</html> 
+</html>
