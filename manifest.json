@@ -1,14 +1,20 @@
 {
   "manifest_version": 3,
   "name": "AI Bookmark Organizer",
-  "version": "1.1.0",
-  "description": "Uses AI to automatically organize your bookmarks into folders. Requires OpenAI API key.",
-  "author": "shamchimohammad",
-  "homepage_url": "https://github.com/shamchimohammad/ai-bookmark-enhancer",
-  "permissions": ["bookmarks", "storage", "alarms"],
-  "host_permissions": ["https://api.openai.com/"],
+  "version": "2.0.0",
+  "description": "Organize your bookmarks using AI with single-shot or improved chunking flows",
+  "permissions": [
+    "bookmarks",
+    "storage",
+    "alarms",
+    "downloads"
+  ],
+  "host_permissions": [
+    "https://api.openai.com/*"
+  ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "action": {
     "default_popup": "popup.html",
@@ -19,12 +25,12 @@
     }
   },
   "options_page": "options.html",
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.openai.com;"
-  },
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
   }
 }
