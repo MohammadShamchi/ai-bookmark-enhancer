@@ -1,0 +1,29 @@
+{
+  "name": "ai-bookmark-enhancer",
+  "version": "1.1.0",
+  "description": "An intelligent Chrome extension that automatically organizes your bookmarks into categorized folders using the OpenAI API.",
+  "main": "background.js",
+  "scripts": {
+    "dev": "npx tailwindcss -i src/styles/popup.tailwind.css -o popup.css --watch",
+    "build:popup": "npx tailwindcss -i src/styles/popup.tailwind.css -o popup.css --minify",
+    "build:options": "npx tailwindcss -i src/styles/options.tailwind.css -o options.css --minify",
+    "build": "npm run build:popup && npm run build:options"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MohammadShamchi/ai-bookmark-enhancer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/MohammadShamchi/ai-bookmark-enhancer/issues"
+  },
+  "homepage": "https://github.com/MohammadShamchi/ai-bookmark-enhancer#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.12"
+  }
+}
