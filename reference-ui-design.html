@@ -1,0 +1,680 @@
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Bookmark Enhancer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen antialiased bg-[#0f172a] text-slate-100 font-[Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto] selection:bg-indigo-500/30 selection:text-white">
+  <!-- Background Mesh Gradient -->
+  <div class="fixed inset-0 -z-10 overflow-hidden">
+    <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full blur-3xl opacity-30 bg-gradient-to-tr from-indigo-600 via-purple-600 to-indigo-700 animate-pulse"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[36rem] h-[36rem] rounded-full blur-3xl opacity-20 bg-gradient-to-br from-purple-600 via-indigo-600 to-purple-700"></div>
+    <div class="absolute bottom-0 right-0 w-80 h-80 rounded-full blur-3xl opacity-25 bg-cyan-500/30"></div>
+    <div class="absolute top-10 right-20 w-48 h-48 rounded-full blur-2xl opacity-20 bg-indigo-400/40 animate-pulse"></div>
+  </div>
+
+  <!-- App Wrapper -->
+  <div id="appRoot" class="mx-auto my-8 flex items-center justify-center">
+    <!-- Popup Container (360x500) -->
+    <section id="popupView" class="w-[360px] h-[500px] bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.45)] relative overflow-hidden flex flex-col">
+      <!-- Header -->
+      <header class="px-4 pt-4 pb-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <!-- Logo -->
+            <div class="h-8 w-8 rounded-lg bg-white/10 border border-white/10 flex items-center justify-center shadow-inner">
+              <!-- lucide:bookmark -->
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-indigo-300" aria-hidden="true">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </div>
+            <div class="leading-tight">
+              <h1 class="text-[18px] tracking-tight font-semibold text-white">AI Bookmark Enhancer</h1>
+              <p class="text-xs text-slate-400">Intelligent bookmark organization powered by OpenAI</p>
+            </div>
+          </div>
+          <!-- Settings shortcut -->
+          <button id="openSettingsTop" class="p-2 rounded-lg hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:ring-offset-1 focus:ring-offset-slate-900 transition">
+            <!-- lucide:cog -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-slate-300" aria-hidden="true">
+              <path d="M12 15.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z" stroke="currentColor" stroke-width="1.5"></path>
+              <path d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.07a2 2 0 01-2.83 2.83l-.07-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.54V21a2 2 0 01-4 0v-.09a1.7 1.7 0 00-1-1.54 1.7 1.7 0 00-1.87.34l-.07.06a2 2 0 01-2.83-2.83l.06-.07a1.7 1.7 0 00.34-1.87 1.7 1.7 0 00-1.54-1H3a2 2 0 010-4h.09a1.7 1.7 0 001.54-1 1.7 1.7 0 00-.34-1.87l-.06-.07A2 2 0 015.06 3.4l.07.06a1.7 1.7 0 001.87.34H7a1.7 1.7 0 001-1.54V2a2 2 0 014 0v.09a1.7 1.7 0 001 1.54h.06a1.7 1.7 0 001.87-.34l.07-.06a2 2 0 012.83 2.83l-.06.07a1.7 1.7 0 00-.34 1.87v.06A1.7 1.7 0 0021 12h.09a2 2 0 010 4H21a1.7 1.7 0 00-1.6-.94h-.06z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Status bar -->
+        <div class="mt-3 flex items-center gap-2">
+          <!-- AI Ready Badge -->
+          <div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+            </span>
+            <span class="text-[11px] leading-none font-medium text-emerald-300">AI Ready</span>
+          </div>
+          <!-- Model Chip -->
+          <div id="activeModelChip" class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-medium text-slate-200">GPT-4.1 Mini</div>
+          <!-- Debug/info -->
+          <button id="debugBtn" class="ml-auto px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-medium text-slate-200 hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:ring-offset-1 focus:ring-offset-slate-900">
+            Debug
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Glass Card -->
+      <main class="px-3 py-2 flex-1 overflow-hidden">
+        <div class="relative">
+          <!-- Gradient border wrapper -->
+          <div class="p-[1.5px] rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600">
+            <div class="rounded-2xl bg-white/10 backdrop-blur-2xl border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.35)]">
+              <!-- Card Content -->
+              <div class="p-4">
+                <!-- Primary Controls -->
+                <div id="primaryControls" class="space-y-4">
+                  <!-- Organize Button -->
+                  <button id="organizeBtn" class="w-full group relative overflow-hidden rounded-xl px-4 py-3 text-sm font-semibold tracking-tight text-white bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg hover:shadow-indigo-900/40 transition transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:ring-offset-1 focus:ring-offset-slate-900">
+                    <span class="relative z-10 flex items-center justify-center gap-2">
+                      <!-- lucide:sparkles -->
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="opacity-90" aria-hidden="true">
+                        <path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5L12 3z" stroke="currentColor" stroke-width="1.5"></path>
+                        <path d="M19 13l.75 1.75L21.5 15.5 19.75 16.25 19 18 18.25 16.25 16.5 15.5l1.75-.75L19 13z" stroke="currentColor" stroke-width="1.5"></path>
+                        <path d="M6 14l.9 2.1L9 17l-2.1.9L6 20l-.9-2.1L3 17l2.1-.9L6 14z" stroke="currentColor" stroke-width="1.5"></path>
+                      </svg>
+                      Organize My Bookmarks
+                    </span>
+                    <!-- Shimmer overlay -->
+                    <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition"></div>
+                  </button>
+
+                  <!-- Model Selector -->
+                  <div class="relative">
+                    <button id="modelBtn" class="w-full flex items-center justify-between rounded-xl bg-white/5 border border-white/10 px-3 py-2.5 text-sm text-slate-200 hover:bg-white/10 transition transform hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:ring-offset-1 focus:ring-offset-slate-900">
+                      <div class="flex items-center gap-2">
+                        <!-- lucide:cpu -->
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-indigo-300" aria-hidden="true">
+                          <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.5"></rect>
+                          <rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"></rect>
+                          <path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                        </svg>
+                        <span class="font-medium">Model</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <span id="modelLabel" class="text-slate-300">GPT-4.1 Mini</span>
+                        <!-- lucide:chevron-down -->
+                        <svg id="modelChevron" width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-slate-400 transition-transform" aria-hidden="true">
+                          <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                      </div>
+                    </button>
+                    <div id="modelMenu" class="hidden absolute z-20 mt-2 w-full rounded-xl bg-slate-900/95 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden">
+                      <ul class="py-1 text-sm">
+                        <li><button data-model="GPT-4.1 Mini" class="w-full text-left px-3 py-2 hover:bg-white/10 transition flex items-center justify-between"><span>GPT-4.1 Mini</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-indigo-400 opacity-0 group-[.active]/item:opacity-100" aria-hidden="true"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></li>
+                        <li><button data-model="GPT-4.1" class="w-full text-left px-3 py-2 hover:bg-white/10 transition">GPT-4.1</button></li>
+                        <li><button data-model="GPT-4o Mini" class="w-full text-left px-3 py-2 hover:bg-white/10 transition">GPT-4o Mini</button></li>
+                        <li><button data-model="GPT-4.1 Nano" class="w-full text-left px-3 py-2 hover:bg-white/10 transition">GPT-4.1 Nano</button></li>
+                        <li><button data-model="GPT-4 Turbo" class="w-full text-left px-3 py-2 hover:bg-white/10 transition">GPT-4 Turbo</button></li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Progress Panel -->
+                <div id="progressPanel" class="hidden">
+                  <!-- Status -->
+                  <div class="mt-1 mb-3 flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></div>
+                    <p id="statusText" class="text-sm text-slate-300">Preparing AI pipeline…</p>
+                  </div>
+                  <!-- Circular + Stats -->
+                  <div class="flex items-center gap-4">
+                    <div class="relative">
+                      <svg id="progressRing" width="72" height="72" viewBox="0 0 120 120" class="drop-shadow">
+                        <defs>
+                          <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#4f46e5"></stop>
+                            <stop offset="100%" stop-color="#7c3aed"></stop>
+                          </linearGradient>
+                        </defs>
+                        <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.08)" stroke-width="12" fill="none"></circle>
+                        <circle id="ringProgress" cx="60" cy="60" r="50" stroke="url(#ringGradient)" stroke-linecap="round" stroke-width="12" fill="none" stroke-dasharray="314" stroke-dashoffset="314" transform="rotate(-90 60 60)"></circle>
+                      </svg>
+                      <div class="absolute inset-0 flex items-center justify-center">
+                        <span id="ringLabel" class="text-sm font-semibold">0%</span>
+                      </div>
+                    </div>
+                    <div class="flex-1 space-y-2">
+                      <!-- Linear progress -->
+                      <div>
+                        <div class="flex justify-between text-xs text-slate-400 mb-1">
+                          <span>Processing</span>
+                          <span id="progressPct">0%</span>
+                        </div>
+                        <div class="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                          <div id="progressBar" class="h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 rounded-full w-0 transition-all"></div>
+                        </div>
+                      </div>
+                      <!-- Stats -->
+                      <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="rounded-lg bg-white/5 border border-white/10 px-2 py-1.5">
+                          <div class="text-slate-400">Chunks/sec</div>
+                          <div id="chunksRate" class="font-semibold text-slate-100">0.0</div>
+                        </div>
+                        <div class="rounded-lg bg-white/5 border border-white/10 px-2 py-1.5">
+                          <div class="text-slate-400">ETA</div>
+                          <div id="eta" class="font-semibold text-slate-100">--:--</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Task List -->
+                  <div class="mt-4">
+                    <div class="flex items-center justify-between mb-2">
+                      <h3 class="text-sm font-medium tracking-tight">Task Queue</h3>
+                      <div class="text-[11px] text-slate-400">Live updates</div>
+                    </div>
+                    <div id="taskList" class="h-24 overflow-y-auto pr-1 space-y-2">
+                      <!-- Tasks injected here -->
+                    </div>
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="mt-4 grid grid-cols-2 gap-2">
+                    <button id="stopBtn" class="group flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-600/20 text-red-300 border border-red-600/30 hover:bg-red-600/30 transition focus:outline-none focus:ring-2 focus:ring-red-500/60 focus:ring-offset-1 focus:ring-offset-slate-900">
+                      <!-- lucide:stop-circle -->
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+                        <rect x="9" y="9" width="6" height="6" fill="currentColor" rx="1"></rect>
+                      </svg>
+                      <span>Emergency Stop</span>
+                      <span id="stopPulse" class="ml-1 h-2 w-2 rounded-full bg-red-400 animate-ping"></span>
+                    </button>
+                    <button id="resetBtn" class="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/5 text-slate-200 border border-white/10 hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:ring-offset-1 focus:ring-offset-slate-900">
+                      <!-- lucide:rotate-ccw -->
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M3 12a9 9 0 109-9v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M3 4v5h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                      Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- Divider -->
+              <div class="h-px w-full bg-white/10"></div>
+              <!-- Footer -->
+              <footer class="px-4 py-3 flex items-center justify-between">
+                <button id="openSettings" class="text-sm text-slate-300 hover:text-white hover:underline underline-offset-4 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:ring-offset-1 focus:ring-offset-slate-900 rounded px-1">
+                  Settings
+                </button>
+                <div class="flex items-center gap-2">
+                  <!-- Info -->
+                  <button id="infoBtn" class="p-2 rounded-lg hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:ring-offset-1 focus:ring-offset-slate-900" aria-label="Info">
+                    <!-- lucide:info -->
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-slate-300" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+                      <path d="M12 16v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                      <path d="M12 8h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                    </svg>
+                  </button>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </div>
+      </main>
+    </section>
+
+    <!-- Settings View (600x700) -->
+    <section id="settingsView" class="hidden w-[600px] h-[700px] bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.45)] relative overflow-hidden flex flex-col">
+      <!-- Header -->
+      <header class="px-5 pt-5 pb-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="h-9 w-9 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center">
+            <!-- lucide:sliders -->
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="text-indigo-300" aria-hidden="true">
+              <path d="M21 4H14M10 4H3M21 12H12M8 12H3M21 20H16M12 20H3M14 2v4M8 10v4M16 18v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-[20px] tracking-tight font-semibold text-white">Settings</h2>
+            <p class="text-xs text-slate-400">Configure API access &amp; preferences</p>
+          </div>
+        </div>
+        <button id="backToPopup" class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm text-slate-200 hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:ring-offset-1 focus:ring-offset-slate-900">
+          Back
+        </button>
+      </header>
+
+      <div class="px-5 pb-5 flex-1 overflow-y-auto">
+        <!-- API Key -->
+        <section class="mb-5 space-y-3">
+          <h3 class="text-sm font-medium tracking-tight">API Key Configuration</h3>
+          <div class="p-[1.5px] rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600">
+            <div class="rounded-xl bg-white/10 border border-white/10 p-4">
+              <label for="apiKey" class="block text-xs text-slate-300 mb-2">OpenAI API Key</label>
+              <div class="flex items-center gap-2">
+                <input id="apiKey" type="password" placeholder="sk-********************************" class="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:ring-offset-1 focus:ring-offset-slate-900 text-slate-100" aria-label="OpenAI API Key">
+                <button id="toggleKey" class="p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:ring-offset-1 focus:ring-offset-slate-900" aria-label="Show or hide API key">
+                  <!-- lucide:eye -->
+                  <svg id="eyeOpen" width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-slate-300" aria-hidden="true">
+                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"></circle>
+                  </svg>
+                  <!-- lucide:eye-off -->
+                  <svg id="eyeClosed" width="18" height="18" viewBox="0 0 24 24" fill="none" class="hidden text-slate-300" aria-hidden="true">
+                    <path d="M17.94 17.94A10.94 10.94 0 0112 20c-6.5 0-10-8-10-8a21.7 21.7 0 015.06-6.26M9.9 4.24A10.94 10.94 0 0112 4c6.5 0 10 8 10 8a21.68 21.68 0 01-4.37 5.94M1 1l22 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Help Accordion -->
+        <section class="mb-5">
+          <div class="p-[1.5px] rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600">
+            <div class="rounded-xl bg-white/10 border border-white/10">
+              <button id="helpToggle" class="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-white/10 rounded-xl transition">
+                <div class="flex items-center gap-2">
+                  <!-- lucide:help-circle -->
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-indigo-300" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+                    <path d="M9.09 9a3 3 0 115.83 1c0 2-3 2-3 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                    <path d="M12 17h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                  </svg>
+                  <span class="text-sm font-medium tracking-tight">How to get your API key</span>
+                </div>
+                <!-- chevron -->
+                <svg id="helpChevron" width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-slate-400 transition-transform" aria-hidden="true">
+                  <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </button>
+              <div id="helpPanel" class="px-4 pb-4 pt-0 transition-all overflow-hidden max-h-0">
+                <ol class="list-decimal list-inside text-sm text-slate-300 space-y-1">
+                  <li>Sign in to your account on the OpenAI platform.</li>
+                  <li>Navigate to the API Keys section in your dashboard.</li>
+                  <li>Create a new secret key and copy it securely.</li>
+                  <li>Paste it above and press Save. Keep it private.</li>
+                </ol>
+                <a href="https://platform.openai.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 mt-3 text-sm text-indigo-300 hover:text-indigo-200 underline underline-offset-4">
+                  Visit OpenAI Platform
+                  <!-- lucide:external-link -->
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M18 13v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                    <path d="M15 3h6v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                    <path d="M10 14L21 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Security Notice -->
+        <section class="mb-5">
+          <div class="rounded-xl bg-amber-500/10 border border-amber-500/20 px-4 py-3 flex items-start gap-3">
+            <!-- lucide:shield -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-amber-300 mt-0.5" aria-hidden="true">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path>
+            </svg>
+            <p class="text-xs text-amber-200">
+              Your API key is stored locally and used only to call the API from this extension. Never share your key.
+            </p>
+          </div>
+        </section>
+
+        <!-- Save -->
+        <section class="mb-8">
+          <button id="saveBtn" class="w-full group relative overflow-hidden rounded-xl px-4 py-2.5 text-sm font-semibold tracking-tight text-white bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg hover:shadow-indigo-900/40 transition transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:ring-offset-1 focus:ring-offset-slate-900">
+            <span class="relative z-10 flex items-center justify-center gap-2">
+              <!-- lucide:save -->
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path>
+                <path d="M17 21v-8H7v8M7 3v5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+              </svg>
+              Save
+            </span>
+          </button>
+        </section>
+      </div>
+
+      <!-- Slide-in Messages -->
+      <div id="toastWrap" class="pointer-events-none absolute top-4 right-4 space-y-2"></div>
+    </section>
+  </div>
+
+  <!-- Debug Panel -->
+  <div id="debugPanel" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[360px] bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl p-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <!-- lucide:bug -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-cyan-300" aria-hidden="true">
+          <path d="M8 2l1 3h6l1-3M4 13h16M6 9h12M6 17h12M12 6v14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+          <rect x="7" y="6" width="10" height="12" rx="5" stroke="currentColor" stroke-width="1.5"></rect>
+        </svg>
+        <span class="text-sm font-medium">Debug</span>
+      </div>
+      <button id="closeDebug" class="p-1 rounded hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:ring-offset-1 focus:ring-offset-slate-900" aria-label="Close debug panel">
+        <!-- lucide:x -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-slate-300" aria-hidden="true">
+          <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="mt-3 text-xs text-slate-300">
+      <div>Model: <span id="dbgModel" class="text-indigo-300">GPT-4.1 Mini</span></div>
+      <div>Status: <span id="dbgStatus" class="text-indigo-300">Idle</span></div>
+      <div>Progress: <span id="dbgProgress" class="text-indigo-300">0%</span></div>
+    </div>
+  </div>
+
+  <script>
+    // Elements
+    const appRoot = document.getElementById('appRoot');
+    const popupView = document.getElementById('popupView');
+    const settingsView = document.getElementById('settingsView');
+
+    const openSettings = document.getElementById('openSettings');
+    const openSettingsTop = document.getElementById('openSettingsTop');
+    const backToPopup = document.getElementById('backToPopup');
+
+    const modelBtn = document.getElementById('modelBtn');
+    const modelMenu = document.getElementById('modelMenu');
+    const modelLabel = document.getElementById('modelLabel');
+    const activeModelChip = document.getElementById('activeModelChip');
+
+    const organizeBtn = document.getElementById('organizeBtn');
+    const primaryControls = document.getElementById('primaryControls');
+    const progressPanel = document.getElementById('progressPanel');
+    const statusText = document.getElementById('statusText');
+
+    const ring = document.getElementById('ringProgress');
+    const ringLabel = document.getElementById('ringLabel');
+    const progressBar = document.getElementById('progressBar');
+    const progressPct = document.getElementById('progressPct');
+    const chunksRate = document.getElementById('chunksRate');
+    const eta = document.getElementById('eta');
+    const taskList = document.getElementById('taskList');
+
+    const stopBtn = document.getElementById('stopBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const stopPulse = document.getElementById('stopPulse');
+
+    const debugBtn = document.getElementById('debugBtn');
+    const debugPanel = document.getElementById('debugPanel');
+    const closeDebug = document.getElementById('closeDebug');
+    const dbgModel = document.getElementById('dbgModel');
+    const dbgStatus = document.getElementById('dbgStatus');
+    const dbgProgress = document.getElementById('dbgProgress');
+
+    const infoBtn = document.getElementById('infoBtn');
+    const toastWrap = document.getElementById('toastWrap');
+
+    const apiKeyInput = document.getElementById('apiKey');
+    const toggleKey = document.getElementById('toggleKey');
+    const eyeOpen = document.getElementById('eyeOpen');
+    const eyeClosed = document.getElementById('eyeClosed');
+    const helpToggle = document.getElementById('helpToggle');
+    const helpPanel = document.getElementById('helpPanel');
+    const helpChevron = document.getElementById('helpChevron');
+    const saveBtn = document.getElementById('saveBtn');
+
+    let modelOpen = false;
+    let processing = false;
+    let stopped = false;
+    let progress = 0;
+    let timer = null;
+    let taskCounter = 0;
+
+    // Utility: Toast
+    function showToast(type, text) {
+      const colors = {
+        success: { bg: 'bg-emerald-500/15', border: 'border-emerald-500/30', text: 'text-emerald-200' },
+        error: { bg: 'bg-red-500/15', border: 'border-red-500/30', text: 'text-red-200' },
+        info: { bg: 'bg-cyan-500/15', border: 'border-cyan-500/30', text: 'text-cyan-200' }
+      };
+      const c = colors[type] || colors.info;
+      const item = document.createElement('div');
+      item.className = `pointer-events-auto ${c.bg} ${c.border} border rounded-lg shadow-xl px-4 py-3 text-sm ${c.text} transform transition`;
+      item.style.transform = 'translateY(-10px)';
+      item.style.opacity = '0';
+      item.innerHTML = `
+        <div class="flex items-start gap-2">
+          <div class="pt-0.5">
+            ${type==='success' ? 
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' :
+             type==='error' ? 
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M12 8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 16h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>' :
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M12 16v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 8h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'}
+          </div>
+          <div class="flex-1">${text}</div>
+          <button class="ml-3 p-1 rounded hover:bg-white/10">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      `;
+      const closeBtn = item.querySelector('button');
+      closeBtn.addEventListener('click', () => dismiss());
+      toastWrap.appendChild(item);
+      requestAnimationFrame(() => {
+        item.style.transform = 'translateY(0px)';
+        item.style.opacity = '1';
+      });
+      const dismiss = () => {
+        item.style.transform = 'translateY(-10px)';
+        item.style.opacity = '0';
+        setTimeout(() => item.remove(), 180);
+      };
+      setTimeout(dismiss, 3800);
+    }
+
+    // Model dropdown
+    modelBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      modelOpen = !modelOpen;
+      modelMenu.classList.toggle('hidden', !modelOpen);
+      document.getElementById('modelChevron').style.transform = modelOpen ? 'rotate(180deg)' : '';
+    });
+    document.addEventListener('click', () => {
+      if (modelOpen) {
+        modelOpen = false;
+        modelMenu.classList.add('hidden');
+        document.getElementById('modelChevron').style.transform = '';
+      }
+    });
+    modelMenu.querySelectorAll('button[data-model]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const m = btn.getAttribute('data-model');
+        modelLabel.textContent = m;
+        activeModelChip.textContent = m;
+        dbgModel.textContent = m;
+        modelMenu.classList.add('hidden');
+        modelOpen = false;
+        document.getElementById('modelChevron').style.transform = '';
+      });
+    });
+
+    // Progress simulation
+    function setProgress(p) {
+      progress = Math.max(0, Math.min(100, p));
+      const circumference = 2 * Math.PI * 50; // r=50
+      const offset = circumference * (1 - progress / 100);
+      ring.setAttribute('stroke-dashoffset', offset.toString());
+      ringLabel.textContent = `${Math.round(progress)}%`;
+      progressBar.style.width = `${progress}%`;
+      progressPct.textContent = `${Math.round(progress)}%`;
+      dbgProgress.textContent = `${Math.round(progress)}%`;
+    }
+
+    function addTaskItem(idx, state='pending') {
+      const row = document.createElement('div');
+      row.className = 'flex items-center justify-between rounded-lg bg-white/5 border border-white/10 px-2 py-1.5';
+      row.innerHTML = `
+        <div class="flex items-center gap-2">
+          <div class="h-2 w-2 rounded-full ${state==='done' ? 'bg-emerald-400' : 'bg-indigo-400 animate-pulse'}"></div>
+          <span class="text-xs text-slate-200">Chunk ${idx}</span>
+        </div>
+        <div class="text-xs ${state==='done' ? 'text-emerald-300' : 'text-slate-400'} flex items-center gap-1">
+          ${state==='done' ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Done' : 'Processing'}
+        </div>
+      `;
+      taskList.appendChild(row);
+      taskList.scrollTop = taskList.scrollHeight;
+      return row;
+    }
+
+    function startProcessing() {
+      processing = true;
+      stopped = false;
+      setProgress(0);
+      statusText.textContent = 'Analyzing and clustering bookmarks…';
+      dbgStatus.textContent = 'Processing';
+      primaryControls.classList.add('hidden');
+      progressPanel.classList.remove('hidden');
+      taskList.innerHTML = '';
+      taskCounter = 0;
+      const start = Date.now();
+      const totalMs = 14000 + Math.floor(Math.random() * 4000);
+      const estimatedChunks = 18 + Math.floor(Math.random()*8);
+      const tasks = [];
+      const tick = () => {
+        if (stopped) return;
+        const elapsed = Date.now() - start;
+        const pct = Math.min(100, (elapsed / totalMs) * 100);
+        setProgress(pct);
+
+        // Update ETA and rate
+        const remaining = Math.max(0, totalMs - elapsed);
+        const sec = Math.ceil(remaining / 1000);
+        eta.textContent = `00:${sec.toString().padStart(2,'0')}`;
+        const rate = (taskCounter / Math.max(1, elapsed/1000)).toFixed(1);
+        chunksRate.textContent = rate;
+
+        // Add tasks gradually
+        if (tasks.length < estimatedChunks && Math.random() > 0.55) {
+          const idx = tasks.length + 1;
+          const row = addTaskItem(idx, 'pending');
+          tasks.push({ idx, row, done: false });
+        }
+        // Complete tasks
+        tasks.forEach(t => {
+          if (!t.done && Math.random() > 0.7) {
+            t.done = true;
+            taskCounter++;
+            // mutate row
+            const dot = t.row.querySelector('div > div');
+            dot.className = 'h-2 w-2 rounded-full bg-emerald-400';
+            const status = t.row.querySelectorAll('div')[1];
+            status.className = 'text-xs text-emerald-300 flex items-center gap-1';
+            status.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Done';
+          }
+        });
+
+        if (pct >= 100) {
+          completeProcessing();
+          return;
+        }
+        timer = requestAnimationFrame(tick);
+      };
+      timer = requestAnimationFrame(tick);
+    }
+
+    function completeProcessing() {
+      processing = false;
+      dbgStatus.textContent = 'Complete';
+      statusText.textContent = 'Completed! Your bookmarks are now organized.';
+      eta.textContent = '00:00';
+      stopPulse.classList.add('hidden');
+      showToast('success', 'Organization complete. Enjoy your neatly structured bookmarks!');
+    }
+
+    function stopProcessing() {
+      if (!processing) return;
+      stopped = true;
+      processing = false;
+      if (timer) cancelAnimationFrame(timer);
+      statusText.textContent = 'Stopped by user.';
+      dbgStatus.textContent = 'Stopped';
+      showToast('error', 'Processing halted. You can reset to try again.');
+    }
+
+    function resetUI() {
+      stopped = false;
+      processing = false;
+      if (timer) cancelAnimationFrame(timer);
+      setProgress(0);
+      statusText.textContent = 'Ready to process.';
+      eta.textContent = '--:--';
+      chunksRate.textContent = '0.0';
+      taskList.innerHTML = '';
+      progressPanel.classList.add('hidden');
+      primaryControls.classList.remove('hidden');
+      dbgStatus.textContent = 'Idle';
+      stopPulse.classList.remove('hidden');
+    }
+
+    organizeBtn.addEventListener('click', startProcessing);
+    stopBtn.addEventListener('click', stopProcessing);
+    resetBtn.addEventListener('click', resetUI);
+
+    // Settings navigation
+    function goSettings() {
+      popupView.classList.add('hidden');
+      settingsView.classList.remove('hidden');
+      showToast('info', 'You are now in Settings.');
+    }
+    function goPopup() {
+      settingsView.classList.add('hidden');
+      popupView.classList.remove('hidden');
+    }
+    openSettings.addEventListener('click', goSettings);
+    openSettingsTop.addEventListener('click', goSettings);
+    backToPopup.addEventListener('click', goPopup);
+
+    // Debug panel
+    debugBtn.addEventListener('click', () => {
+      debugPanel.classList.toggle('hidden');
+    });
+    closeDebug.addEventListener('click', () => {
+      debugPanel.classList.add('hidden');
+    });
+
+    // Info
+    infoBtn.addEventListener('click', () => showToast('info', 'This tool uses AI to cluster, tag, and reorder your bookmarks by topic and priority.'));
+
+    // API Key show/hide
+    toggleKey.addEventListener('click', () => {
+      const isPwd = apiKeyInput.type === 'password';
+      apiKeyInput.type = isPwd ? 'text' : 'password';
+      eyeOpen.classList.toggle('hidden', !isPwd);
+      eyeClosed.classList.toggle('hidden', isPwd);
+    });
+
+    // Help accordion
+    helpToggle.addEventListener('click', () => {
+      const isClosed = helpPanel.style.maxHeight === '' || helpPanel.style.maxHeight === '0px';
+      helpPanel.style.maxHeight = isClosed ? helpPanel.scrollHeight + 'px' : '0px';
+      helpChevron.style.transform = isClosed ? 'rotate(180deg)' : '';
+    });
+
+    // Save API Key
+    saveBtn.addEventListener('click', () => {
+      const key = apiKeyInput.value.trim();
+      if (key.length < 16 || !key.includes('-')) {
+        showToast('error', 'Invalid API key. Please paste a valid key.');
+        return;
+      }
+      // Simulate save
+      showToast('success', 'API key saved securely.');
+    });
+
+    // Initialize
+    setProgress(0);
+  </script>
+
+</body></html>
