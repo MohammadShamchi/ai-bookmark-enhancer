@@ -730,3 +730,299 @@ Legend:
 ⬜ Not Started
 ⚠️ Blocked
 ```
+
+---
+
+## 📋 PHASE 4: Testing, Polish & Deployment
+
+**Note**: See `PHASE_4_PLAN.md` for comprehensive 35-task checklist.
+
+### Quick Start: Begin Phase 4 Testing
+
+```
+I'm ready to start Phase 4 testing for the AI Bookmark Organizer extension.
+
+Working directory: /Users/amohii/dev/UI-update-ai-bookmar-enhancer/ai-bookmark-enhancer
+
+Please help me:
+
+1. Read the Phase 4 plan:
+   - File: /Users/amohii/dev/UI-update-ai-bookmar-enhancer/ai-bookmark-enhancer/PHASE_4_PLAN.md
+
+2. Start with Task 4.1.1: Load Extension in Chrome
+   - Guide me through loading the extension
+   - Help verify module imports
+   - Check for any errors
+
+3. Create a testing checklist to track progress
+
+Let's begin with Task 4.1.1.
+```
+
+---
+
+### Task 4.1: Extension Loading & Verification
+
+```
+Implement Phase 4, Task 4.1: Extension Loading & Verification
+
+Working directory: /Users/amohii/dev/UI-update-ai-bookmar-enhancer/ai-bookmark-enhancer
+
+Tasks:
+1. Guide me to load extension in Chrome (chrome://extensions/)
+2. Help verify module imports in service worker console
+3. Check for console errors or warnings
+4. Verify extension badge and popup work
+
+Success Criteria:
+- Extension loads without errors
+- Service worker activates successfully
+- All ES6 module imports work
+- No console errors
+
+Please provide step-by-step instructions and what to check at each step.
+```
+
+---
+
+### Task 4.2: Decision Engine Testing
+
+```
+Implement Phase 4, Task 4.2: Decision Engine Testing
+
+Working directory: /Users/amohii/dev/UI-update-ai-bookmar-enhancer/ai-bookmark-enhancer
+
+Test Scenarios:
+1. T1 Tier (≤500 bookmarks): Should select single-shot
+2. T2 Tier (500-2000 bookmarks): Should select single-shot or fallback
+3. T3 Tier (2000-4500 bookmarks): Should select chunking
+
+For each tier:
+- Open extension popup
+- Check pre-processing panel
+- Verify tier badge
+- Verify flow selection
+- Check cost/time estimates
+
+Create a test report showing:
+- Bookmark count
+- Detected tier
+- Selected flow
+- Cost estimate
+- Time estimate
+- Decision reasoning
+
+Please guide me through testing each tier.
+```
+
+---
+
+### Task 4.3: Single-Shot Flow End-to-End Test
+
+```
+Implement Phase 4, Task 4.3: Single-Shot Flow Testing
+
+Working directory: /Users/amohii/dev/UI-update-ai-bookmar-enhancer/ai-bookmark-enhancer
+
+Prerequisites:
+- Valid OpenAI API key set in options
+- Small bookmark dataset (≤2000 bookmarks)
+
+Test Steps:
+1. Open extension popup
+2. Click "Organize My Bookmarks"
+3. Watch progress indicators
+4. Verify each stage completes:
+   - Initializing
+   - Analyzing bookmarks
+   - Uploading to AI
+   - AI Processing
+   - Applying changes
+   - Complete
+5. Check that backup HTML was downloaded
+6. Verify bookmarks are organized
+7. Confirm no data loss
+
+Please help me:
+- Monitor the process
+- Log any errors
+- Verify success criteria
+- Create test report
+```
+
+---
+
+### Task 4.4: Error Handling Test Suite
+
+```
+Implement Phase 4, Task 4.5: Error Handling Testing
+
+Working directory: /Users/amohii/dev/UI-update-ai-bookmar-enhancer/ai-bookmark-enhancer
+
+Test Cases:
+1. Invalid API Key
+   - Remove/invalidate API key
+   - Try to organize
+   - Verify error message shown
+
+2. Network Timeout
+   - Simulate network issue
+   - Verify timeout handling
+   - Check rollback offered
+
+3. Empty Bookmark Tree
+   - Test with zero bookmarks
+   - Verify warning shown
+   - Confirm no API call made
+
+4. Extremely Large Dataset
+   - Test with >10K bookmarks
+   - Verify backend recommendation shown
+   - Check cost warning displayed
+
+For each test case, document:
+- Test setup
+- Expected behavior
+- Actual behavior
+- Pass/Fail status
+
+Please guide me through each test case.
+```
+
+---
+
+### Task 4.8: Documentation Updates
+
+```
+Implement Phase 4, Task 4.8: Documentation Updates
+
+Working directory: /Users/amohii/dev/UI-update-ai-bookmar-enhancer/ai-bookmark-enhancer
+
+Tasks:
+1. Update README.md with v2.0 features:
+   - Single-shot processing
+   - Chunking fallback
+   - Tier system
+   - Cost optimization
+
+2. Create USER_GUIDE.md:
+   - Getting Started
+   - Setting Up API Key
+   - Organizing Bookmarks
+   - Understanding Tiers
+   - Cost Optimization Tips
+   - Troubleshooting
+   - FAQ
+
+3. Create CHANGELOG.md for v2.0:
+   - Version 2.0.0
+   - Release date
+   - Major features
+   - Performance improvements
+   - Breaking changes (if any)
+
+4. Review and update privacy-policy.md:
+   - Verify data handling explained
+   - API usage disclosed
+   - Storage explained
+
+Please help create these documentation files following best practices.
+```
+
+---
+
+### Task 4.9: Deployment Preparation
+
+```
+Implement Phase 4, Task 4.9: Deployment Preparation
+
+Working directory: /Users/amohii/dev/UI-update-ai-bookmar-enhancer/ai-bookmark-enhancer
+
+Tasks:
+1. Version Bump to 2.0.0:
+   - Update manifest.json version field
+   - Update any version references in code
+   - Update documentation version numbers
+
+2. Clean Production Build:
+   - Remove debug console.log statements
+   - Remove development comments
+   - Review for sensitive data
+   - Verify no API keys in code
+
+3. Security Review:
+   - Verify API keys never logged
+   - Check CSP configuration
+   - Verify minimal permissions
+   - Review for XSS vulnerabilities
+
+4. Create Release Zip:
+   - Include all necessary files
+   - Exclude development files
+   - Create zip for Chrome Web Store
+
+5. Prepare Store Assets:
+   - Screenshots (1280x800)
+   - Promotional images
+   - Description text
+   - Keywords
+
+Please guide me through each step and create a deployment checklist.
+```
+
+---
+
+### Complete Phase 4 Workflow
+
+```
+I want to complete Phase 4 from start to finish.
+
+Working directory: /Users/amohii/dev/UI-update-ai-bookmar-enhancer/ai-bookmark-enhancer
+
+Please:
+1. Read PHASE_4_PLAN.md for the complete 35-task checklist
+2. Execute tasks in order:
+   - 4.1: Extension Loading (tasks 4.1.1-4.1.2)
+   - 4.2: Decision Engine Testing (tasks 4.2.1-4.2.3)
+   - 4.3: Single-Shot Testing (tasks 4.3.1-4.3.3)
+   - 4.4: Chunking Testing (tasks 4.4.1-4.4.3)
+   - 4.5: Error Handling (tasks 4.5.1-4.5.6)
+   - 4.6: UI/UX Polish (tasks 4.6.1-4.6.5)
+   - 4.7: Performance (tasks 4.7.1-4.7.3)
+   - 4.8: Documentation (tasks 4.8.1-4.8.4)
+   - 4.9: Deployment (tasks 4.9.1-4.9.5)
+   - 4.10: Final Validation (tasks 4.10.1-4.10.3)
+
+3. Create detailed test report for each section
+4. Mark tasks as complete in checklist
+5. Prepare final release package
+
+Let's work through these systematically. Start with 4.1.
+```
+
+---
+
+### Phase 4 Status Tracking
+
+Update after each task:
+
+```
+PHASE 4: Testing, Polish & Deployment
+- [⬜] 4.1: Extension Loading & Verification
+- [⬜] 4.2: Decision Engine Testing
+- [⬜] 4.3: Single-Shot Flow Testing
+- [⬜] 4.4: Chunking Flow Testing
+- [⬜] 4.5: Error Handling & Edge Cases
+- [⬜] 4.6: UI/UX Polish
+- [⬜] 4.7: Performance Optimization
+- [⬜] 4.8: Documentation Updates
+- [⬜] 4.9: Deployment Preparation
+- [⬜] 4.10: Final Validation
+
+Legend:
+✅ Complete & Verified
+🏗️ In Progress
+⬜ Not Started
+⚠️ Blocked/Issues Found
+🔧 Needs Fixes
+```

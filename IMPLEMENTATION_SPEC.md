@@ -2780,21 +2780,107 @@ export function updateContextWithFolders(context, newFolders) {
 
 ---
 
-## PHASE 4: UI/UX Enhancements
+## PHASE 4: Testing, Polish & Deployment Preparation
 
-*Detailed specifications for UI updates, progress indicators, consent screens, diff preview, etc.*
+**Goal**: Test complete system, polish UI/UX, handle edge cases, and prepare for production deployment.
+
+**Status**: ✅ UI Already Enhanced | 🔄 Testing Required
+
+**Note**: Much of Phase 4 UI work was completed in advance (pre-processing panel, consent modal, progress tracking). Focus is now on comprehensive testing and deployment preparation.
+
+### 4.1. Extension Loading & Verification
+
+**Objective**: Verify extension loads correctly in Chrome.
+
+**Tasks**:
+- 4.1.1. Load extension in Chrome (`chrome://extensions/`)
+- 4.1.2. Verify module imports work (check service worker console)
+- 4.1.3. Confirm no console errors or warnings
+
+**Success Criteria**:
+- ✅ Extension loads without errors
+- ✅ Service worker activates
+- ✅ All ES6 modules import successfully
+
+---
+
+### 4.2. End-to-End Testing
+
+**Objective**: Test all processing flows comprehensively.
+
+**Test Scenarios**:
+1. **T1 Tier (≤500 bookmarks)**: Single-shot flow
+2. **T2 Tier (500-2000 bookmarks)**: Single-shot with fallback
+3. **T3 Tier (2000-4500 bookmarks)**: Chunking flow
+4. **T4 Tier (>10K bookmarks)**: Backend recommendation
+
+**For Each Tier**:
+- Decision engine selects correct flow
+- Progress tracking works
+- Operations execute successfully
+- No data loss
+- Backup created
+
+---
+
+### 4.3. Error Handling Testing
+
+**Objective**: Verify all error scenarios handled gracefully.
+
+**Test Cases**:
+- Invalid/missing API key
+- Network timeout
+- Invalid AI response
+- Dry-run validation failures
+- Empty bookmark tree
+- Extremely large datasets
+
+**Success Criteria**:
+- ✅ Clear error messages
+- ✅ No partial changes
+- ✅ Rollback options offered
+
+---
+
+### 4.4. Performance Validation
+
+**Objective**: Ensure extension performs within expectations.
+
+**Metrics to Measure**:
+- Extension load time (<500ms)
+- Processing time vs estimates (±20%)
+- Memory usage (<50MB)
+- API call efficiency
+
+---
+
+### 4.5. Documentation & Deployment
+
+**Objective**: Prepare for production release.
+
+**Tasks**:
+- Update README.md with v2.0 features
+- Create USER_GUIDE.md
+- Create CHANGELOG.md
+- Update privacy policy
+- Version bump to 2.0.0
+- Create release build
+- Prepare Chrome Web Store assets
+- Security review
+
+**For detailed Phase 4 tasks, see**: `PHASE_4_PLAN.md` (35 tasks total)
 
 ---
 
 ## PHASE 5: Testing & Quality Assurance
 
-*Comprehensive test specifications*
+*Note: Phase 5 has been merged into Phase 4 for efficiency*
 
 ---
 
 ## PHASE 6: Documentation & Deployment
 
-*Documentation and deployment procedures*
+*Note: Phase 6 has been merged into Phase 4 for efficiency*
 
 ---
 
