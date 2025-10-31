@@ -48,8 +48,11 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('🔍 Debug button exists:', !!document.getElementById('debugBtn'));
 
   const organizeBtn = document.getElementById('organizeBtn');
+  const organizeBtnText = document.getElementById('organizeBtnText');
   const progressPanel = document.getElementById('progressPanel');
+  const preProcessingPanel = document.getElementById('preProcessingPanel');
   const statusText = document.getElementById('statusText');
+  const phaseName = document.getElementById('phaseName');
   const progressContainer = progressPanel.querySelector(
     '.flex.items-center.gap-4'
   );
@@ -57,9 +60,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const ringProgress = document.getElementById('ringProgress');
   const ringLabel = document.getElementById('ringLabel');
   const progressPct = document.getElementById('progressPct');
-  const chunksRate = document.getElementById('chunksRate');
+  const currentStage = document.getElementById('currentStage');
   const eta = document.getElementById('eta');
   const taskList = document.getElementById('taskList');
+
+  // Pre-processing panel elements
+  const bookmarkCount = document.getElementById('bookmarkCount');
+  const tierBadge = document.getElementById('tierBadge');
+  const flowBadge = document.getElementById('flowBadge');
+  const estimatedCost = document.getElementById('estimatedCost');
+  const estimatedTime = document.getElementById('estimatedTime');
+  const decisionExplanation = document.getElementById('decisionExplanation');
+  const decisionReasoning = document.getElementById('decisionReasoning');
+
+  // Consent modal elements
+  const consentModal = document.getElementById('consentModal');
+  const consentCancelBtn = document.getElementById('consentCancelBtn');
+  const consentConfirmBtn = document.getElementById('consentConfirmBtn');
+  const consentAgreementCheckbox = document.getElementById('consentAgreementCheckbox');
+  const backupCheckbox = document.getElementById('backupCheckbox');
+  const consentEstimatedCost = document.getElementById('consentEstimatedCost');
+  const consentEstimatedTime = document.getElementById('consentEstimatedTime');
+  const consentTierBadge = document.getElementById('consentTierBadge');
+  const consentTierDescription = document.getElementById('consentTierDescription');
+  const consentFlowBadge = document.getElementById('consentFlowBadge');
+  const consentFlowDescription = document.getElementById('consentFlowDescription');
+  const consentBookmarkCount = document.getElementById('consentBookmarkCount');
 
   // Model selection functionality
   const modelBtn = document.getElementById('modelBtn');
@@ -107,6 +133,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Model name mapping (display name -> API model name)
+  const modelMapping = {
+    'GPT-4.1 Mini': 'gpt-4o-mini',
+    'GPT-4.1': 'gpt-4o',
+    'GPT-4o Mini': 'gpt-4o-mini',
+    'GPT-4.1 Nano': 'gpt-4o-mini',
+    'GPT-4 Turbo': 'gpt-4-turbo'
+  };
+
   // Model selection
   modelOptions.forEach((option) => {
     option.addEventListener('click', (e) => {
@@ -121,18 +156,25 @@ document.addEventListener('DOMContentLoaded', () => {
       option.classList.add('bg-indigo-500/20', 'text-indigo-300');
 
       // Update displayed model
-      const modelName = option.dataset.model;
-      modelLabel.textContent = modelName;
-      activeModelChip.textContent = modelName;
+      const displayName = option.dataset.model;
+      const apiModelName = modelMapping[displayName] || 'gpt-4o';
+      modelLabel.textContent = displayName;
+      activeModelChip.textContent = displayName;
 
-      // Store selected model
-      chrome.storage.sync.set({ selectedModel: modelName });
+      // Store both display and API model names
+      chrome.storage.sync.set({
+        selectedModel: apiModelName,
+        selectedModelDisplay: displayName
+      });
 
       // Close dropdown
       modelMenu.classList.add('hidden');
       modelChevron.style.transform = 'rotate(0deg)';
 
       soundManager.playSound('click', 0.4);
+
+      // Re-analyze with new model
+      setTimeout(() => analyzeBookmarks(), 100);
     });
   });
 
@@ -148,22 +190,28 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Load saved model preference
-  chrome.storage.sync.get(['selectedModel'], (result) => {
-    if (result.selectedModel) {
-      const savedOption = modelMenu.querySelector(
-        `[data-model="${result.selectedModel}"]`
+  chrome.storage.sync.get(['selectedModel', 'selectedModelDisplay'], (result) => {
+    const displayName = result.selectedModelDisplay || 'GPT-4.1 Mini';
+    const apiModelName = result.selectedModel || 'gpt-4o-mini';
+
+    const savedOption = modelMenu.querySelector(
+      `[data-model="${displayName}"]`
+    );
+    if (savedOption) {
+      modelOptions.forEach((opt) =>
+        opt.classList.remove('bg-indigo-500/20', 'text-indigo-300')
       );
-      if (savedOption) {
-        modelOptions.forEach((opt) =>
-          opt.classList.remove('bg-indigo-500/20', 'text-indigo-300')
-        );
-        savedOption.classList.add('bg-indigo-500/20', 'text-indigo-300');
-        modelLabel.textContent = result.selectedModel;
-        activeModelChip.textContent = result.selectedModel;
-      }
+      savedOption.classList.add('bg-indigo-500/20', 'text-indigo-300');
+      modelLabel.textContent = displayName;
+      activeModelChip.textContent = displayName;
     } else {
       // Default to GPT-4.1 Mini if no preference saved
-      chrome.storage.sync.set({ selectedModel: 'GPT-4.1 Mini' });
+      chrome.storage.sync.set({
+        selectedModel: 'gpt-4o-mini',
+        selectedModelDisplay: 'GPT-4.1 Mini'
+      });
+      modelLabel.textContent = 'GPT-4.1 Mini';
+      activeModelChip.textContent = 'GPT-4.1 Mini';
     }
   });
 
@@ -182,22 +230,58 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Stage name mapping for better UX
+  const stageNames = {
+    'initializing': 'Initializing',
+    'auth': 'Authenticating',
+    'analyzing': 'Analyzing Bookmarks',
+    'deciding': 'Determining Strategy',
+    'preparing': 'Preparing',
+    'exporting': 'Exporting Bookmarks',
+    'backup': 'Creating Backup',
+    'compressing': 'Compressing Data',
+    'uploading': 'Uploading to AI',
+    'processing': 'AI Processing',
+    'chunk_processing': 'Processing Chunks',
+    'reconciling': 'Reconciling Results',
+    'finalizing': 'Finalizing',
+    'validating': 'Validating Operations',
+    'applying': 'Applying Changes',
+    'applying-folders': 'Creating Folders',
+    'applying-moves': 'Moving Bookmarks',
+    'applying-renames': 'Renaming Folders',
+    'applying-removals': 'Cleaning Up',
+    'complete': 'Complete'
+  };
+
+  function getStageDisplayName(stage) {
+    if (!stage) return 'Processing';
+    // Handle phase-specific stages
+    if (stage.startsWith('applying-')) {
+      const phase = stage.replace('applying-', '');
+      return `Applying: ${phase.charAt(0).toUpperCase() + phase.slice(1)}`;
+    }
+    return stageNames[stage] || stage.charAt(0).toUpperCase() + stage.slice(1).replace(/_/g, ' ');
+  }
+
   function updateUi(job) {
     // Reset status panel classes
     progressPanel.classList.add('hidden');
     progressPanel.classList.remove('running', 'success', 'error');
     statusText.classList.remove('updated');
+    phaseName.classList.add('hidden');
 
     // Trigger reflow for animation
     void progressPanel.offsetWidth;
 
     if (!job) {
       statusText.textContent = '';
-      organizeBtn.disabled = false;
+      organizeBtn.disabled = false; // Enabled by default, consent checked in modal
       progressBar.style.width = '0%';
       updateCircularProgress(0);
       resetBtn.style.display = 'none';
       stopBtn.style.display = 'none';
+      preProcessingPanel.classList.add('hidden');
       checkApiKey();
       return;
     }
@@ -217,16 +301,36 @@ document.addEventListener('DOMContentLoaded', () => {
     statusText.textContent = message;
     statusText.classList.add('updated');
 
+    // Show pre-processing panel if decision info is available
+    if (job.decision && job.status !== 'running' && job.status !== 'completed' && job.status !== 'error') {
+      preProcessingPanel.classList.remove('hidden');
+      updatePreProcessingPanel(job.decision);
+    } else {
+      preProcessingPanel.classList.add('hidden');
+    }
+
     // Handle different job states
     if (job.status === 'running') {
       organizeBtn.disabled = true;
       progressPanel.classList.add('running');
+      preProcessingPanel.classList.add('hidden');
       const progress = job.progress || 0;
       progressBar.style.width = `${progress}%`;
       updateCircularProgress(progress);
       resetBtn.style.display = 'none';
       stopBtn.style.display = 'block';
       soundManager.playSound('processing', 0.1);
+
+      // Update stage display
+      if (job.stage && currentStage) {
+        currentStage.textContent = getStageDisplayName(job.stage);
+      }
+
+      // Update phase name
+      if (job.stage && phaseName) {
+        phaseName.textContent = getStageDisplayName(job.stage);
+        phaseName.classList.remove('hidden');
+      }
 
       // Update progress if available
       if (job.chunkIndex && job.totalChunks) {
@@ -236,13 +340,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Update performance stats
-      if (chunksRate && job.chunksPerSecond) {
-        chunksRate.textContent = job.chunksPerSecond.toFixed(1);
-      }
       if (eta && job.eta) {
         const etaMin = Math.round(job.eta / 60);
         const etaSec = Math.round(job.eta % 60);
         eta.textContent = `${etaMin}:${etaSec.toString().padStart(2, '0')}`;
+      } else if (eta && job.estimatedCompletion) {
+        eta.textContent = job.estimatedCompletion;
       }
     } else if (job.status === 'complete') {
       organizeBtn.disabled = false;
@@ -309,12 +412,14 @@ document.addEventListener('DOMContentLoaded', () => {
           taskList.appendChild(row);
         });
       } else {
-        // Show default task items for common processing steps
+        // Show default task items for common processing steps with better names
         const defaultSteps = [
-          'API Validation',
-          'Bookmark Analysis',
+          'Authenticating',
+          'Analyzing Bookmarks',
+          'Creating Backup',
           'AI Processing',
-          'Organization',
+          'Validating',
+          'Applying Changes',
         ];
 
         defaultSteps.forEach((step, idx) => {
@@ -325,7 +430,9 @@ document.addEventListener('DOMContentLoaded', () => {
           let state = 'processing';
           if (job.status === 'running' && job.progress) {
             const progress = job.progress;
-            if (progress > idx * 25) state = 'done';
+            // Map progress to steps (6 steps, ~16.67% each)
+            if (progress > (idx + 1) * 16.67) state = 'done';
+            else if (progress > idx * 16.67) state = 'processing';
           }
 
           row.innerHTML = `
@@ -402,7 +509,184 @@ document.addEventListener('DOMContentLoaded', () => {
     updateUi(job);
   });
 
-  organizeBtn.addEventListener('click', () => {
+  // Function to update pre-processing panel
+  function updatePreProcessingPanel(decision) {
+    if (!decision) return;
+
+    // Update bookmark count
+    if (bookmarkCount && decision.bookmarkCount !== undefined) {
+      bookmarkCount.textContent = decision.bookmarkCount.toLocaleString();
+    }
+
+    // Update tier badge
+    if (tierBadge && decision.tier) {
+      tierBadge.textContent = decision.tier;
+      // Color code tiers
+      const tierColors = {
+        'T1': 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+        'T2': 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+        'T3': 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+        'T4': 'bg-red-500/20 text-red-300 border-red-500/30'
+      };
+      tierBadge.className = `px-2 py-0.5 rounded-full text-xs font-medium border ${tierColors[decision.tier] || 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'}`;
+    }
+
+    // Update flow badge
+    if (flowBadge && decision.flow) {
+      const flowNames = {
+        'single-shot': 'Single-Shot',
+        'improved-chunking': 'Improved Chunking',
+        'backend-assisted': 'Backend-Assisted'
+      };
+      flowBadge.textContent = flowNames[decision.flow] || decision.flow;
+    }
+
+    // Update cost estimate
+    if (estimatedCost && decision.estimatedCost) {
+      estimatedCost.textContent = `$${parseFloat(decision.estimatedCost).toFixed(4)}`;
+    }
+
+    // Update time estimate
+    if (estimatedTime && decision.estimatedTime) {
+      estimatedTime.textContent = decision.estimatedTime;
+    }
+
+    // Update decision explanation
+    if (decision.reasoning && decision.reasoning.length > 0) {
+      if (decisionExplanation && decisionReasoning) {
+        decisionReasoning.textContent = decision.reasoning.join(' ');
+        decisionExplanation.classList.remove('hidden');
+      }
+    }
+  }
+
+  // Function to analyze bookmarks and show pre-processing info
+  async function analyzeBookmarks() {
+    chrome.storage.sync.get(['openaiApiKey', 'selectedModel'], async (result) => {
+      if (!result.openaiApiKey || result.openaiApiKey.trim() === '') {
+        return; // Will be handled by checkApiKey
+      }
+
+      const selectedModel = result.selectedModel || 'gpt-4o';
+
+      // Request analysis from background script
+      chrome.runtime.sendMessage({
+        action: 'analyzeBookmarks',
+        model: selectedModel
+      }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.warn('Analysis failed:', chrome.runtime.lastError.message);
+          return;
+        }
+
+        if (response && response.success && response.decision) {
+          updatePreProcessingPanel(response.decision);
+          preProcessingPanel.classList.remove('hidden');
+          // Button enabled by default - consent will be checked in modal
+          organizeBtn.disabled = false;
+        } else {
+          // Hide panel if analysis fails
+          preProcessingPanel.classList.add('hidden');
+        }
+      });
+    });
+  }
+
+  // Note: Old consent checkbox logic removed - now using consent modal instead
+
+  // Tier descriptions
+  const tierDescriptions = {
+    'T1': 'Small collection (≤2,000 bookmarks). Fast single-request processing.',
+    'T2': 'Medium collection (2,001-4,500 bookmarks). Single-request or chunked processing.',
+    'T3': 'Large collection (4,501-10,000 bookmarks). Chunked processing with global context.',
+    'T4': 'Very large collection (10,000+ bookmarks). Requires backend-assisted processing.'
+  };
+
+  // Flow descriptions
+  const flowDescriptions = {
+    'single-shot': 'All bookmarks will be processed in a single AI request. Fastest method, ideal for smaller collections.',
+    'improved-chunking': 'Bookmarks will be processed in multiple chunks with shared context. More efficient for larger collections.',
+    'backend-assisted': 'Requires backend service. Currently not available in extension-only mode.'
+  };
+
+  // Function to show consent modal with decision data
+  function showConsentModal(decision) {
+    if (!decision) return;
+
+    // Update modal with decision data
+    if (consentBookmarkCount) {
+      consentBookmarkCount.textContent = decision.bookmarkCount ? decision.bookmarkCount.toLocaleString() : '--';
+    }
+
+    if (consentEstimatedCost && decision.estimatedCost) {
+      consentEstimatedCost.textContent = `$${parseFloat(decision.estimatedCost).toFixed(4)}`;
+    }
+
+    if (consentEstimatedTime && decision.estimatedTime) {
+      consentEstimatedTime.textContent = decision.estimatedTime;
+    }
+
+    if (consentTierBadge && decision.tier) {
+      consentTierBadge.textContent = decision.tier;
+      const tierColors = {
+        'T1': 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+        'T2': 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+        'T3': 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+        'T4': 'bg-red-500/20 text-red-300 border-red-500/30'
+      };
+      consentTierBadge.className = `px-2 py-1 rounded-full text-xs font-medium border ${tierColors[decision.tier] || 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'}`;
+    }
+
+    if (consentTierDescription && decision.tier) {
+      consentTierDescription.textContent = tierDescriptions[decision.tier] || 'Loading tier information...';
+    }
+
+    if (consentFlowBadge && decision.flow) {
+      const flowNames = {
+        'single-shot': 'Single-Shot',
+        'improved-chunking': 'Improved Chunking',
+        'backend-assisted': 'Backend-Assisted'
+      };
+      consentFlowBadge.textContent = flowNames[decision.flow] || decision.flow;
+    }
+
+    if (consentFlowDescription && decision.flow) {
+      consentFlowDescription.textContent = flowDescriptions[decision.flow] || 'Loading flow information...';
+    }
+
+    // Reset checkboxes
+    consentAgreementCheckbox.checked = false;
+    backupCheckbox.checked = true; // Default checked
+    consentConfirmBtn.disabled = true;
+
+    // Show modal
+    consentModal.classList.remove('hidden');
+    soundManager.playSound('click', 0.2);
+  }
+
+  // Update consent confirm button state
+  consentAgreementCheckbox.addEventListener('change', () => {
+    if (consentConfirmBtn) {
+      consentConfirmBtn.disabled = !consentAgreementCheckbox.checked;
+    }
+  });
+
+  // Consent modal cancel button
+  consentCancelBtn.addEventListener('click', () => {
+    consentModal.classList.add('hidden');
+    consentAgreementCheckbox.checked = false;
+    soundManager.playSound('click', 0.3);
+  });
+
+  // Consent modal confirm button
+  consentConfirmBtn.addEventListener('click', () => {
+    if (!consentAgreementCheckbox.checked) {
+      return;
+    }
+
+    // Hide modal
+    consentModal.classList.add('hidden');
+
     // Check API key before starting
     chrome.storage.sync.get(['openaiApiKey', 'selectedModel'], (result) => {
       if (!result.openaiApiKey || result.openaiApiKey.trim() === '') {
@@ -413,7 +697,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const selectedModel = result.selectedModel || 'GPT-4.1 Mini';
+      const selectedModel = result.selectedModel || 'gpt-4o';
+
+      // Hide pre-processing panel
+      preProcessingPanel.classList.add('hidden');
 
       // This message starts the whole process in the background script
       chrome.runtime.sendMessage(
@@ -443,6 +730,42 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
       );
+    });
+
+    soundManager.playSound('click', 0.4);
+  });
+
+  // Close modal when clicking outside
+  consentModal.addEventListener('click', (e) => {
+    if (e.target === consentModal) {
+      consentModal.classList.add('hidden');
+      consentAgreementCheckbox.checked = false;
+    }
+  });
+
+  organizeBtn.addEventListener('click', () => {
+    // Check API key first
+    chrome.storage.sync.get(['openaiApiKey', 'selectedModel'], (result) => {
+      if (!result.openaiApiKey || result.openaiApiKey.trim() === '') {
+        updateUi({
+          status: 'error',
+          message: 'Please set your OpenAI API key in options first.',
+        });
+        return;
+      }
+
+      // Get decision data for consent modal
+      chrome.runtime.sendMessage({
+        action: 'analyzeBookmarks',
+        model: result.selectedModel || 'gpt-4o'
+      }, (response) => {
+        if (response && response.success && response.decision) {
+          showConsentModal(response.decision);
+        } else {
+          // Fallback: show consent modal without decision data
+          showConsentModal(null);
+        }
+      });
     });
   });
 
@@ -522,6 +845,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   checkApiKey(); // Initial check
+
+  // Analyze bookmarks on load to show pre-processing info
+  analyzeBookmarks();
+
+  // Re-analyze when model changes
+  modelOptions.forEach((option) => {
+    option.addEventListener('click', () => {
+      setTimeout(() => analyzeBookmarks(), 100);
+    });
+  });
 });
 
 // Note: All bookmark processing logic has been moved to background.js for better architecture.

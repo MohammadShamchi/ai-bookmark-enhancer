@@ -3,7 +3,7 @@
  * Calculates size, token estimates, and compression metrics for bookmark data
  */
 
-import modelsConfig from '../config/models.json';
+import modelsConfig from '../config/models.json' assert { type: 'json' };
 
 /**
  * Calculate comprehensive metrics for bookmark data

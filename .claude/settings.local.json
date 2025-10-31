@@ -3,7 +3,8 @@
     "allow": [
       "WebFetch(domain:developer.chrome.com)",
       "WebFetch(domain:platform.openai.com)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

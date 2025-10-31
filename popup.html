@@ -70,14 +70,61 @@
             <div class="p-4">
               <!-- Primary Controls -->
               <div id="primaryControls" class="space-y-4">
-                <button id="organizeBtn" class="w-full group relative overflow-hidden rounded-xl px-4 py-3 text-sm font-semibold tracking-tight text-white bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg hover:shadow-indigo-900/40 transition transform hover:scale-[1.02]">
+                <!-- Pre-Processing Info Panel -->
+                <div id="preProcessingPanel" class="hidden space-y-3">
+                  <!-- Metrics Display -->
+                  <div class="rounded-xl bg-white/5 border border-white/10 p-3 space-y-2">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs text-slate-400">Bookmark Count</span>
+                      <span id="bookmarkCount" class="text-sm font-semibold text-slate-200">--</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs text-slate-400">Tier</span>
+                      <span id="tierBadge" class="px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">--</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs text-slate-400">Processing Flow</span>
+                      <span id="flowBadge" class="text-xs font-medium text-slate-300">--</span>
+                    </div>
+                  </div>
+
+                  <!-- Cost & Time Estimates -->
+                  <div class="grid grid-cols-2 gap-2">
+                    <div class="rounded-xl bg-white/5 border border-white/10 p-3">
+                      <div class="text-xs text-slate-400 mb-1">Estimated Cost</div>
+                      <div id="estimatedCost" class="text-sm font-semibold text-emerald-300">$--</div>
+                    </div>
+                    <div class="rounded-xl bg-white/5 border border-white/10 p-3">
+                      <div class="text-xs text-slate-400 mb-1">Estimated Time</div>
+                      <div id="estimatedTime" class="text-sm font-semibold text-cyan-300">--</div>
+                    </div>
+                  </div>
+
+                  <!-- Decision Explanation -->
+                  <div id="decisionExplanation" class="hidden rounded-xl bg-indigo-500/10 border border-indigo-500/20 p-3">
+                    <div class="flex items-start gap-2">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="text-indigo-300 mt-0.5 flex-shrink-0" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+                        <path d="M12 16v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                        <path d="M12 8h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                      </svg>
+                      <div class="flex-1">
+                        <div class="text-xs font-medium text-indigo-200 mb-1">Why this flow?</div>
+                        <div id="decisionReasoning" class="text-xs text-slate-300 leading-relaxed">--</div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <button id="organizeBtn" class="w-full group relative overflow-hidden rounded-xl px-4 py-3 text-sm font-semibold tracking-tight text-white bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg hover:shadow-indigo-900/40 transition transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
                   <span class="relative z-10 flex items-center justify-center gap-2">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="opacity-90" aria-hidden="true">
                       <path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5L12 3z" stroke="currentColor" stroke-width="1.5"></path>
                       <path d="M19 13l.75 1.75L21.5 15.5 19.75 16.25 19 18 18.25 16.25 16.5 15.5l1.75-.75L19 13z" stroke="currentColor" stroke-width="1.5"></path>
                       <path d="M6 14l.9 2.1L9 17l-2.1.9L6 20l-.9-2.1L3 17l2.1-.9L6 14z" stroke="currentColor" stroke-width="1.5"></path>
                     </svg>
-                    Organize My Bookmarks
+                    <span id="organizeBtnText">Organize My Bookmarks</span>
                   </span>
                   <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition"></div>
                 </button>
@@ -116,9 +163,13 @@
 
               <!-- Progress Panel -->
               <div id="progressPanel" class="hidden">
-                <div class="mt-1 mb-3 flex items-center gap-2">
-                  <div class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></div>
-                  <p id="statusText" class="text-sm text-slate-300">Preparing AI pipeline…</p>
+                <div class="mt-1 mb-3 space-y-2">
+                  <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></div>
+                    <p id="statusText" class="text-sm text-slate-300">Preparing AI pipeline…</p>
+                  </div>
+                  <!-- Phase Name Display -->
+                  <div id="phaseName" class="text-xs text-slate-400 ml-4 hidden"></div>
                 </div>
 
                 <!-- Circular Progress -->
@@ -152,8 +203,8 @@
                     <!-- Performance Stats -->
                     <div class="grid grid-cols-2 gap-2 text-xs">
                       <div class="rounded-lg bg-white/5 border border-white/10 px-2 py-1.5">
-                        <div class="text-slate-400">Chunks/sec</div>
-                        <div id="chunksRate" class="font-semibold text-slate-100">0.0</div>
+                        <div class="text-slate-400">Stage</div>
+                        <div id="currentStage" class="font-semibold text-slate-100 text-[10px]">--</div>
                       </div>
                       <div class="rounded-lg bg-white/5 border border-white/10 px-2 py-1.5">
                         <div class="text-slate-400">ETA</div>
@@ -210,6 +261,183 @@
         </button>
       </footer>
     </section>
+  </div>
+
+  <!-- Consent Modal -->
+  <div id="consentModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div class="w-[400px] max-h-[90vh] overflow-y-auto bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl m-4">
+      <!-- Modal Header -->
+      <div class="p-6 border-b border-white/10">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="h-10 w-10 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="text-indigo-300" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+              <path d="M12 16v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+              <path d="M12 8h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-white">Consent Required</h2>
+        </div>
+        <p class="text-sm text-slate-400">Please review the following information before proceeding</p>
+      </div>
+
+      <!-- Modal Content -->
+      <div class="p-6 space-y-6">
+        <!-- What Data Will Be Sent -->
+        <div>
+          <h3 class="text-sm font-semibold text-slate-200 mb-2 flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="text-indigo-300" aria-hidden="true">
+              <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.5"></rect>
+              <path d="M9 9h6M9 12h6M9 15h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            </svg>
+            Data That Will Be Sent
+          </h3>
+          <div class="rounded-lg bg-white/5 border border-white/10 p-3 space-y-2">
+            <div class="flex items-start gap-2 text-xs text-slate-300">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="text-indigo-400 mt-0.5 flex-shrink-0" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+              <span>Bookmark titles and folder names</span>
+            </div>
+            <div class="flex items-start gap-2 text-xs text-slate-300">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="text-indigo-400 mt-0.5 flex-shrink-0" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+              <span>Bookmark URLs</span>
+            </div>
+            <div class="flex items-start gap-2 text-xs text-slate-300">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="text-indigo-400 mt-0.5 flex-shrink-0" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+              <span>Folder structure and hierarchy</span>
+            </div>
+            <div class="mt-2 pt-2 border-t border-white/10 text-[10px] text-slate-400">
+              <strong class="text-slate-300">Note:</strong> No passwords, personal notes, or other sensitive data will be sent. Only bookmark metadata.
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Provider -->
+        <div>
+          <h3 class="text-sm font-semibold text-slate-200 mb-2 flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="text-indigo-300" aria-hidden="true">
+              <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.5"></rect>
+              <rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"></rect>
+            </svg>
+            AI Provider
+          </h3>
+          <div class="rounded-lg bg-white/5 border border-white/10 p-3">
+            <div class="flex items-center gap-2">
+              <div class="h-6 w-6 rounded bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                <span class="text-[10px] font-bold text-white">AI</span>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-slate-200">OpenAI</div>
+                <div class="text-xs text-slate-400">Your data will be processed by OpenAI's API</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cost & Time Estimates -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <h3 class="text-sm font-semibold text-slate-200 mb-2">Estimated Cost</h3>
+            <div class="rounded-lg bg-emerald-500/10 border border-emerald-500/20 p-3">
+              <div id="consentEstimatedCost" class="text-lg font-bold text-emerald-300">$--</div>
+              <div class="text-[10px] text-slate-400 mt-1">Based on bookmark count</div>
+            </div>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-slate-200 mb-2">Estimated Time</h3>
+            <div class="rounded-lg bg-cyan-500/10 border border-cyan-500/20 p-3">
+              <div id="consentEstimatedTime" class="text-lg font-bold text-cyan-300">--</div>
+              <div class="text-[10px] text-slate-400 mt-1">Processing duration</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tier Information -->
+        <div>
+          <h3 class="text-sm font-semibold text-slate-200 mb-2 flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="text-indigo-300" aria-hidden="true">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="1.5"></path>
+              <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.5"></path>
+            </svg>
+            Dataset Tier
+          </h3>
+          <div class="rounded-lg bg-white/5 border border-white/10 p-3">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs text-slate-400">Your bookmark collection is classified as:</span>
+              <span id="consentTierBadge" class="px-2 py-1 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">--</span>
+            </div>
+            <div id="consentTierDescription" class="text-xs text-slate-300 leading-relaxed">
+              Loading tier information...
+            </div>
+          </div>
+        </div>
+
+        <!-- Processing Flow -->
+        <div>
+          <h3 class="text-sm font-semibold text-slate-200 mb-2">Processing Method</h3>
+          <div class="rounded-lg bg-white/5 border border-white/10 p-3">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs text-slate-400">Selected flow:</span>
+              <span id="consentFlowBadge" class="text-xs font-medium text-slate-300">--</span>
+            </div>
+            <div id="consentFlowDescription" class="text-xs text-slate-300 leading-relaxed mt-2">
+              Loading flow information...
+            </div>
+          </div>
+        </div>
+
+        <!-- Bookmark Count -->
+        <div>
+          <div class="rounded-lg bg-white/5 border border-white/10 p-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-slate-400">Total Bookmarks</span>
+              <span id="consentBookmarkCount" class="text-sm font-semibold text-slate-200">--</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Backup Checkbox -->
+        <label class="flex items-start gap-3 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 cursor-pointer hover:bg-emerald-500/15 transition">
+          <input type="checkbox" id="backupCheckbox" checked class="mt-0.5 w-4 h-4 rounded border-white/20 bg-white/5 text-emerald-600 focus:ring-2 focus:ring-emerald-500/60 cursor-pointer">
+          <div class="flex-1">
+            <div class="text-sm font-medium text-emerald-200 mb-1">Create backup before proceeding</div>
+            <div class="text-xs text-slate-300 leading-relaxed">A complete HTML backup of your bookmarks will be automatically downloaded before any changes are made. This ensures you can restore your bookmarks if needed.</div>
+          </div>
+        </label>
+
+        <!-- Consent Agreement -->
+        <label class="flex items-start gap-3 p-4 rounded-lg bg-indigo-500/10 border-2 border-indigo-500/30 cursor-pointer hover:bg-indigo-500/15 transition">
+          <input type="checkbox" id="consentAgreementCheckbox" class="mt-0.5 w-5 h-5 rounded border-white/20 bg-white/5 text-indigo-600 focus:ring-2 focus:ring-indigo-500/60 cursor-pointer">
+          <div class="flex-1">
+            <div class="text-sm font-semibold text-indigo-200 mb-1">I understand and agree</div>
+            <div class="text-xs text-slate-300 leading-relaxed">
+              I consent to sending my bookmark data (titles, URLs, and folder structure) to OpenAI for AI processing. I understand that:
+              <ul class="list-disc list-inside mt-2 space-y-1 text-slate-400">
+                <li>My bookmark data will be processed by OpenAI's API</li>
+                <li>A backup will be created automatically before any changes</li>
+                <li>I can stop the process at any time</li>
+                <li>No passwords or other sensitive data will be sent</li>
+              </ul>
+            </div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-6 border-t border-white/10 flex items-center gap-3">
+        <button id="consentCancelBtn" class="flex-1 px-4 py-2.5 rounded-lg bg-white/5 text-slate-200 border border-white/10 hover:bg-white/10 transition font-medium text-sm">
+          Cancel
+        </button>
+        <button id="consentConfirmBtn" disabled class="flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-sm shadow-lg hover:shadow-indigo-900/40 transition transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg">
+          I Understand & Agree
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Debug Panel -->
