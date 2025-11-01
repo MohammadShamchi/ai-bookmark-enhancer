@@ -23,9 +23,9 @@
   </div>
 
   <!-- App Root -->
-  <div id="appRoot" class="mx-auto my-4 flex items-center justify-center">
-    <!-- Popup View Container -->
-    <section id="popupView" class="w-[360px] h-[600px] bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.45)] relative flex flex-col">
+  <div id="appRoot" class="mx-auto my-4 flex justify-center min-h-screen py-10">
+    <!-- Main View Container -->
+    <section id="popupView" class="w-full max-w-4xl bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.45)] relative flex flex-col">
       <!-- Header Section -->
       <header class="px-6 pt-5 pb-3">
         <div class="flex items-center justify-between">
@@ -264,8 +264,8 @@
   </div>
 
   <!-- Consent Modal -->
-  <div id="consentModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-    <div class="w-[400px] max-h-[calc(100vh-2rem)] bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl m-4 flex flex-col">
+  <div id="consentModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="w-full max-w-2xl max-h-[calc(100vh-2rem)] bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
       <!-- Modal Header -->
       <div class="p-4 border-b border-white/10 flex-shrink-0">
         <div class="flex items-center gap-3 mb-2">
@@ -282,7 +282,7 @@
       </div>
 
       <!-- Modal Content -->
-      <div class="p-4 space-y-4 flex-1 overflow-y-auto">
+      <div class="p-4 space-y-4 flex-1 overflow-y-auto min-h-0">
         <!-- What Data Will Be Sent -->
         <div>
           <h3 class="text-sm font-semibold text-slate-200 mb-2 flex items-center gap-2">
@@ -441,7 +441,7 @@
   </div>
 
   <!-- Debug Panel -->
-  <div id="debugPanel" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[360px] bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl p-4">
+  <div id="debugPanel" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-md bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl p-4 mx-4">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-cyan-300" aria-hidden="true">

@@ -34,6 +34,11 @@ import { executeOperations, dryRunOperations } from './src/core/operation-execut
 const JOB_STORAGE_KEY = 'bookmarkOrganizationJob';
 const TIMEOUT_MS = 1800000; // 30 minutes
 
+// Handle extension icon click - open organizer in new tab
+chrome.action.onClicked.addListener((tab) => {
+  chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
+});
+
 // Main message listener
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // Handle organize bookmarks request

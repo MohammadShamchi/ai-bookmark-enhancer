@@ -1,28 +1,34 @@
 <!-- 97427ba8-db40-41a3-9a95-729585a16454 8c0d2df8-6a74-403c-a91b-51898a9dbd1d -->
-# Fix Container Padding Issue
+# Fix Consent Modal Scroll Issue
 
 ## Problem
 
-The information display cards (Bookmark Count, Tier, Processing Flow, Estimated Cost, Estimated Time) have insufficient padding, making the content appear cramped against the container borders.
+The consent modal content was not scrollable, causing the submit buttons to be hidden off-screen when the modal content exceeded the viewport height. Users could see the scrollbar but couldn't scroll to reveal the buttons at the bottom.
+
+## Root Cause
+
+Two issues were preventing proper scrolling:
+1. The modal container was missing `overflow-hidden`, which is required for flex containers with `max-h` constraints
+2. The modal content container had `flex-1 overflow-y-auto` but was missing `min-h-0`. Without `min-h-0`, flex children won't shrink below their content size
 
 ## Solution
 
-Increase the padding on the following containers in `popup.html`:
+Made two changes:
+1. Added `overflow-hidden` to the modal container to constrain overflow properly
+2. Added `min-h-0` to the modal content container to allow proper flex shrinking and scrolling
 
-1. **Metrics Display Card** (line 76)
+```268:268:popup.html
+    <div class="w-[400px] max-h-[calc(100vh-2rem)] bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl m-4 flex flex-col overflow-hidden">
+```
 
-- Change from `p-3` to `p-4`
-- This affects: Bookmark Count, Tier, Processing Flow
+```285:285:popup.html
+      <div class="p-4 space-y-4 flex-1 overflow-y-auto min-h-0">
+```
 
-2. **Cost & Time Estimate Cards** (lines 93, 97)
+## Files Modified
 
-- Change from `p-3` to `p-4`
-- This affects: Estimated Cost and Estimated Time cards
+- `/Users/amohii/dev/UI-update-ai-bookmar-enhancer/ai-bookmark-enhancer/popup.html` (lines 268, 285)
 
-## Files to Modify
+## Result
 
-- `/Users/amohii/dev/UI-update-ai-bookmar-enhancer/ai-bookmark-enhancer/popup.html`
-
-## Changes
-
-The padding will increase from 12px to 16px, providing better visual breathing room while maintaining the overall design aesthetic.
+The modal now properly scrolls its content while keeping the header and footer (with submit buttons) always visible and accessible.
