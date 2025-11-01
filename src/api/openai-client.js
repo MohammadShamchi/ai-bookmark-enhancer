@@ -3,7 +3,7 @@
  * Handles communication with OpenAI API
  */
 
-import modelsConfig from '../config/models.json' assert { type: 'json' };
+import modelsConfig from '../config/models.js';
 
 /**
  * Send chat completion request

@@ -4,7 +4,7 @@
  */
 
 import { calculateBookmarkMetrics, canUseSingleShot } from '../utils/metrics.js';
-import modelsConfig from '../config/models.json' assert { type: 'json' };
+import modelsConfig from '../config/models.js';
 
 /**
  * Decide which processing flow to use

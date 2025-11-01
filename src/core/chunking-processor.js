@@ -8,7 +8,7 @@ import { generateGlobalContext, updateContextWithFolders } from './context-gener
 import { sendChatCompletion, withRetry } from '../api/openai-client.js';
 import { getSystemPromptChunking } from '../config/prompts.js';
 import { exportAndDownload } from '../utils/html-export.js';
-import modelsConfig from '../config/models.json' assert { type: 'json' };
+import modelsConfig from '../config/models.js';
 
 /**
  * Process bookmarks using chunked flow

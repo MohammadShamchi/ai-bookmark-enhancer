@@ -4,7 +4,15 @@
       "WebFetch(domain:developer.chrome.com)",
       "WebFetch(domain:platform.openai.com)",
       "WebSearch",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Read(//Users/amohii/dev/UI-update-ai-bookmar-enhancer/src/**)",
+      "Read(//Users/amohii/dev/UI-update-ai-bookmar-enhancer/tasks/**)",
+      "Read(//Users/amohii/dev/UI-update-ai-bookmar-enhancer/.claude/**)",
+      "Read(//Users/amohii/dev/UI-update-ai-bookmar-enhancer/**)"
     ],
     "deny": [],
     "ask": []
